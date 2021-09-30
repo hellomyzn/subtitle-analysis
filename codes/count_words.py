@@ -4,19 +4,20 @@ import collections
 import csv
 
 
-
 def main():
     args = sys.argv
     words = []
     words_without_noise = []
     noise = []
-    words_times = []
+    word_times = []
 
     file_path = get_file_path(args)
+    file_name = get_file_name(args)
+
     extract_words(file_path, words)
     remove_noise(words, words_without_noise, noise)
-    words_times = count_words(words_without_noise)
-    export_csv(words_times)
+    word_times = count_words(words_without_noise)
+    export_csv(word_times, file_name)
 
 def get_file_path(args):
     try:
@@ -25,6 +26,11 @@ def get_file_path(args):
         print(str.upper("***   choose file which you want to try   ***"))
         exit()
 
+def get_file_name(args):
+    try:
+        return args[2]
+    except:
+        print(str.upper("***   file name is not difined   ***"))
 
 def extract_words(file_path, words):
     try:
@@ -56,15 +62,17 @@ def remove_noise(words, words_without_noise, noise):
         else:
             noise.append(word)
         
+
 def count_words(words_without_noise):
     c = collections.Counter(words_without_noise)
     return c.most_common()
 
 
-def export_csv(words_times):
-    with open("stock.csv", "w", encoding="Shift_jis") as f: # 文字コードをShift_JISに指定
-        writer = csv.writer(f, lineterminator="\n") # writerオブジェクトの作成 改行記号で行を区切る
-        writer.writerows(words_times) # csvファイルに書き込み
+def export_csv(word_times, file_name):
+    file_name = file_name + ".csv"
+    with open("../csvs/" + file_name, "w", encoding="Shift_jis") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerows(word_times)
 
 if __name__ == "__main__":
     main()
