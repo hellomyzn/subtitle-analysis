@@ -5,12 +5,13 @@ def main():
 
     file_path = get_file_path(args)
 
-    read_file(file_path)
+    sentences = read_file(file_path)
 
-    # extract sentence
+    extract_subtitle(sentences)
 
     # separate words
     print("done")
+    
 
 
 def get_file_path(args):
@@ -24,15 +25,17 @@ def get_file_path(args):
 def read_file(file_path):
     try:
         with open(file_path) as f:
-            for line in f:
-                print(line)
+            s = f.read()
+            return s.splitlines()
+
     except:
         print(str.upper("***   wrong file path   ***"))
         exit()
 
 
 
-# def extract_subtitle()
+def extract_subtitle(sentences):
+    print(sentences)
 
 
 # def create_words_list()
