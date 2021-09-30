@@ -26,6 +26,8 @@ def extract_words(file_path, words):
         with open(file_path) as f:
             for line in f:
                 words.extend(line.split())
+
+            print("WORDS:                " + str(len(words)))
         return words
     except:
         print(str.upper("***   wrong file path   ***"))
@@ -52,6 +54,9 @@ def remove_noises(words, words_without_noises, noises):
             words_without_noises.append(str.lower(word))
         else:
             noises.append(word)
+
+    print("NOISES:               " + str(len(noises)))
+    print("WORDS_WITHOUT_NOISES: " + str(len(words_without_noises)))
     return words_without_noises, noises
         
 
