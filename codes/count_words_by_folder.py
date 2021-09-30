@@ -8,7 +8,7 @@ def main():
     args = sys.argv
     files = []
     words = []
-    words_without_noise = []
+    words_without_noises = []
     noises = []
     word_times = []
 
@@ -20,8 +20,8 @@ def main():
         file_name = os.path.split(file_path)[-1]
 
         words = count_words.extract_words(file_path, words)
-        words_without_noise, noises = count_words.remove_noise(words, words_without_noise, noises)
-        word_times = count_words.count_words(words_without_noise)
+        words_without_noises, noises = count_words.remove_noises(words, words_without_noises, noises)
+        word_times = count_words.count_words(words_without_noises)
         count_words.export_csv(word_times, file_name)
         count_words.export_noises(noises, file_name)
 

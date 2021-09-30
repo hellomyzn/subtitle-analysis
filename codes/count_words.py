@@ -32,12 +32,13 @@ def extract_words(file_path, words):
         exit()
 
 
-def remove_noise(words, words_without_noise, noises):
+def remove_noises(words, words_without_noises, noises):
     words = [word.replace("'", '') for word in words]
     words = [word.replace('"', '') for word in words]
     words = [word.replace(":", '') for word in words]
     words = [word.replace(",", '') for word in words]
     words = [word.replace(".", '') for word in words]
+    words = [word.replace("/", '') for word in words]
     words = [word.replace("?", '') for word in words]
     words = [word.replace("!", '') for word in words]
     words = [word.replace("-", '') for word in words]
@@ -48,14 +49,14 @@ def remove_noise(words, words_without_noise, noises):
     for word in words:
         # remove except Alphabet
         if word.isalpha():
-            words_without_noise.append(str.lower(word))
+            words_without_noises.append(str.lower(word))
         else:
             noises.append(word)
-    return words_without_noise, noises
+    return words_without_noises, noises
         
 
-def count_words(words_without_noise):
-    c = collections.Counter(words_without_noise)
+def count_words(words_without_noises):
+    c = collections.Counter(words_without_noises)
     return c.most_common()
 
 
@@ -67,7 +68,6 @@ def export_csv(word_times, file_name):
 
 
 def export_noises(noises, file_name):
-    file_name = file_name + "noise.csv"
+    file_name = file_name + "-noise.csv"
     with open("./noises/" + file_name, "w") as f:
-        writer = csv.writer(f, lineterminator="\n")
-        writer.writerows(noises)
+        f.write('\n'.join(noises))
