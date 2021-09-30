@@ -1,6 +1,8 @@
 import sys
 
 import collections
+import csv
+
 
 
 def main():
@@ -8,11 +10,13 @@ def main():
     words = []
     words_without_noise = []
     noise = []
+    words_times = []
 
     file_path = get_file_path(args)
     extract_words(file_path, words)
     remove_noise(words, words_without_noise, noise)
-    count_words(words_without_noise)
+    words_times = count_words(words_without_noise)
+    export_csv(words_times)
 
 def get_file_path(args):
     try:
@@ -54,7 +58,13 @@ def remove_noise(words, words_without_noise, noise):
         
 def count_words(words_without_noise):
     c = collections.Counter(words_without_noise)
-    print(c.items())
+    return c.most_common()
+
+
+def export_csv(words_times):
+    with open("stock.csv", "w", encoding="Shift_jis") as f: # 文字コードをShift_JISに指定
+        writer = csv.writer(f, lineterminator="\n") # writerオブジェクトの作成 改行記号で行を区切る
+        writer.writerows(words_times) # csvファイルに書き込み
 
 if __name__ == "__main__":
     main()
