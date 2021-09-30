@@ -1,7 +1,8 @@
 import collections
 import csv
+import glob
 
-def get_file_path(args):
+def get_path(args):
     try:
         return args[1]
     except:
@@ -14,6 +15,12 @@ def get_file_name(args):
     except:
         print(str.upper("***   file name is not difined   ***"))
 
+
+def get_files_name(folder_path):
+    files = glob.glob(folder_path + "/*")
+    return files
+
+
 def extract_words(file_path, words):
     try:
         with open(file_path) as f:
@@ -25,7 +32,7 @@ def extract_words(file_path, words):
         exit()
 
 
-def remove_noise(words, words_without_noise, noise):
+def remove_noise(words, words_without_noise, noises):
     words = [word.replace("'", '') for word in words]
     words = [word.replace('"', '') for word in words]
     words = [word.replace(":", '') for word in words]
@@ -43,8 +50,8 @@ def remove_noise(words, words_without_noise, noise):
         if word.isalpha():
             words_without_noise.append(str.lower(word))
         else:
-            noise.append(word)
-    return words_without_noise, noise
+            noises.append(word)
+    return words_without_noise, noises
         
 
 def count_words(words_without_noise):
@@ -54,6 +61,13 @@ def count_words(words_without_noise):
 
 def export_csv(word_times, file_name):
     file_name = file_name + ".csv"
-    with open("../csvs/" + file_name, "w", encoding="Shift_jis") as f:
+    with open("./csvs/" + file_name, "w") as f:
         writer = csv.writer(f, lineterminator="\n")
         writer.writerows(word_times)
+
+
+def export_noises(noises, file_name):
+    file_name = file_name + "noise.csv"
+    with open("./noises/" + file_name, "w") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerows(noises)

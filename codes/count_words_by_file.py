@@ -1,7 +1,5 @@
 import sys
-
-import collections
-import csv
+import os
 
 import count_words
 
@@ -10,11 +8,11 @@ def main():
     args = sys.argv
     words = []
     words_without_noise = []
-    noise = []
+    noises = []
     word_times = []
 
-    file_path = count_words.get_file_path(args)
-    file_name = count_words.get_file_name(args)
+    file_path = count_words.get_path(args)
+    file_name = os.path.split(file_path)[-1]
 
     words = count_words.extract_words(file_path, words)
     words_without_noise, noise = count_words.remove_noise(words, words_without_noise, noise)

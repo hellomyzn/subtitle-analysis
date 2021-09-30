@@ -2,6 +2,9 @@
 
 ### How to use
 ```
-# count_words
-$ python count_words FILE_DIRECTORY FILE_NAME_FOR_CSV
+# by file
+$ python codes/count_words_by_file.py FILE/DIRECTORY/PATH
+
+# by folder
+$ python codes/count_words_by_folder FOLDER/DIRECTORY/PATH
 ```
