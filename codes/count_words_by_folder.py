@@ -7,6 +7,7 @@ import count_words
 def main():
     args = sys.argv
     files = []
+    all_words = []
     line = "\n***********************************************************************\n"
 
     folder_path = count_words.get_path(args)
@@ -24,10 +25,18 @@ def main():
 
         words = count_words.extract_words(file_path, words)
         words_without_noises, noises = count_words.remove_noises(words, words_without_noises, noises)
+        all_words.extend(words_without_noises)
+
         word_times = count_words.count_words(words_without_noises)
         count_words.export_csv(word_times, file_name)
         count_words.export_noises(noises, file_name)
         print("DONE:                 " + file_name + line)
+
+    print(line + "START:                all-words")
+    all_word_times = count_words.count_words(all_words)
+    count_words.export_csv(all_word_times, "all-words")
+    print("ALL-WORDS:            " + str(len(all_words)))
+    print("DONE:                 all-words" + line)
 
 if __name__ == "__main__":
     main()
