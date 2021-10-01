@@ -28,11 +28,11 @@ def main():
         word_times = count_words.count_words(words_without_noises)
         count_words.export_csv(word_times, file, "word_and_times")
         count_words.export_txt(noises, file, "noises")
+        count_words.export_txt(words_without_noises, file, "words")
         print("DONE:                 " + file + line)
 
     print(line + "START:                all-words")
     all_word_times = count_words.count_words(all_words)
-    # count_words.export_csv(all_word_times, "all-words")
     print("ALL-WORDS:            " + str(len(all_words)))
     print("DONE:                 all-words" + line)
 
