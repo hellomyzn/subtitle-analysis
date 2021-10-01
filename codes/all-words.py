@@ -33,8 +33,8 @@ def main():
     print("ALL:      " + str(len(all_word_and_times)))
     for frequency, data in words_by_frequency.items():
         percentage = calculate.percentage_of_words(len(all_word_and_times), len(data))
-        print(frequency + ":        " + str(len(data)) + " (" + str(percentage) + ")" )
-    print("DONE:    " + "word_and_times" + line)
+        print(frequency + ":        " + str(len(data)) + " (" + str(percentage) + "%)" )
+    print("DONE:     " + "word_and_times" + line)
 
 
     print(line + "START:    " + "words")
@@ -44,8 +44,29 @@ def main():
         for k, v in data:
             times += v
         percentage = calculate.percentage_of_words(len(all_words), times)
-        print(frequency + ":        " + str(times) + " (" + str(percentage) + ")" )
-    print("DONE:    " + "words" + line)
+        print(frequency + ":        " + str(times) + " (" + str(percentage) + "%)" )
+    print("DONE:     " + "words" + line)
 
+
+    removed_words = manipulate.remove_subject(words_by_frequency)
+
+    print(line + "START:    " + "removed_word_and_times")
+    print("ALL:      " + str(len(all_word_and_times)))
+    for frequency, data in removed_words.items():
+        percentage = calculate.percentage_of_words(len(all_word_and_times), len(data))
+        print(frequency + ":        " + str(len(data)) + " (" + str(percentage) + "%)" )
+    print("DONE:     " + "word_and_times" + line)
+
+    print(line + "START:    " + "removed_words")
+    print("ALL:      " + str(len(all_words)))
+    for frequency, data in removed_words.items():
+        times = 0
+        for k, v in data:
+            times += v
+        percentage = calculate.percentage_of_words(len(all_words), times)
+        print(frequency + ":        " + str(times) + " (" + str(percentage) + "%)" )
+    print("DONE:     " + "words" + line)
+
+    
 if __name__ == "__main__":
     main()

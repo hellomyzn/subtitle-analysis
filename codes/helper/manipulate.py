@@ -34,6 +34,23 @@ def remove_noises(words, words_without_noises, noises):
             noises.append(word)
     return words_without_noises, noises
 
+def remove_subject(words):
+    removed_words = {}
+
+    subjects_pronouns = ["i", "you", "he", "she", "it", "they", "that", "these", "those", "we"]
+    objects_pronouns =  ["me", "him", "her", "them", "us"]
+    possessives_adjectives =  ["my", "your", "his", "its", "our", "their"]
+    possessives_pronouns = ["mine", "yours", "hers" "yours", "ours", "theirs"]
+    reflexive_pronoun = ["myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
+    articles = ["a", "an", "the"]
+    interjections = [ "ah", "aha", "aw", "awesome", "aww", "boy", "man", "bye", "cheers", "cool", "gosh", "eh", "hi", "ha", "hey", "hello", "hmm", "huh", "nope", "oh", "ok", "okay", "ow", "ouch", "please", "shh", "well", "please", "wow", "yeah"]
+
+    remove_words = subjects_pronouns + objects_pronouns + possessives_adjectives + possessives_pronouns + reflexive_pronoun + articles + interjections
+
+    for i in range(1, len(words) + 1):
+        removed_words[str(i)] = [word for word in words[str(i)] if word[0] not in remove_words]
+    return removed_words
+
 
 def export_csv(word_times, file_name, folder_path):
     file_name = file_name + ".csv"
