@@ -25,7 +25,7 @@ def main():
 
     all_word_and_times = calculate.count_words(all_words)
 
-    # system.make_dir("./data/", "all-words")
+    system.make_dir("./data/", "all-words")
     manipulate.export_csv(all_word_and_times, "word_and_times", "all-words")
     words_by_frequency = calculate.count_words_by_frequency(10, all_word_and_times)
 
