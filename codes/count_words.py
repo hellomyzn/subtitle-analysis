@@ -1,23 +1,25 @@
+import sys
+import os
+
 import collections
 import csv
 import glob
 
-def get_path(args):
+
+def get_args(num):
+    args = sys.argv
     try:
-        return args[1]
+        return args[num]
     except:
         print(str.upper("***   choose file which you want to try   ***"))
         exit()
 
-def get_file_name(args):
-    try:
-        return args[2]
-    except:
-        print(str.upper("***   file name is not difined   ***"))
-
 
 def get_files_name(folder_path):
-    files = glob.glob(folder_path + "/*")
+    files = []
+    for f in glob.glob(folder_path + "/*"):
+        files.append(os.path.split(f)[-1])
+
     return files
 
 
@@ -32,6 +34,10 @@ def extract_words(file_path, words):
     except:
         print(str.upper("***   wrong file path   ***"))
         exit()
+
+def make_dir(path):
+    folder_path = "./data/"
+    os.mkdir(folder_path + path)
 
 
 def remove_noises(words, words_without_noises, noises):
@@ -65,9 +71,9 @@ def count_words(words_without_noises):
     return c.most_common()
 
 
-def export_csv(word_times, file_name):
+def export_csv(word_times, file_name, folder_path):
     file_name = file_name + ".csv"
-    with open("./csvs/" + file_name, "w") as f:
+    with open("./data/" + folder_path + "/" + file_name, "w") as f:
         writer = csv.writer(f, lineterminator="\n")
         writer.writerows(word_times)
 

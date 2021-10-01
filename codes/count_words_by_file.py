@@ -1,17 +1,15 @@
-import sys
 import os
 
 import count_words
 
 
 def main():
-    args = sys.argv
     words = []
     words_without_noises = []
     noises = []
     word_times = []
 
-    file_path = count_words.get_path(args)
+    file_path = count_words.get_args(1)
     file_name = os.path.split(file_path)[-1]
 
     words = count_words.extract_words(file_path, words)
