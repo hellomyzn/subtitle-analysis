@@ -12,9 +12,9 @@ def count_words_by_frequency(frequency, words):
     for i in range(1, frequency + 1):
         for word, times in words:
             if frequency <= times and frequency == i:
-                words_by_frequency.setdefault(str(frequency), []).append(word)
+                words_by_frequency.setdefault(str(frequency), []).append([word, times])
             elif times == i: 
-                words_by_frequency.setdefault(str(i), []).append(word)
+                words_by_frequency.setdefault(str(i), []).append([word,times])
 
     return words_by_frequency
 
