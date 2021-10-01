@@ -3,7 +3,7 @@ import shutil
 
 
 def main():
-    csvs_dir = 'csvs'
+    csvs_dir = 'data'
     noises_dir = 'noises'
 
     shutil.rmtree(csvs_dir)
