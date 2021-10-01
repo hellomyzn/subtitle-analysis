@@ -11,9 +11,14 @@ def count_words_by_frequency(frequency, words):
 
     for i in range(1, frequency + 1):
         for word, times in words:
-            if frequency <= times:
+            if frequency <= times and frequency == i:
                 words_by_frequency.setdefault(str(frequency), []).append(word)
             elif times == i: 
                 words_by_frequency.setdefault(str(i), []).append(word)
 
     return words_by_frequency
+
+
+def percentage_of_words(all_word_times: int, words: int):
+    percentage = round((words / all_word_times) * 100, 1)
+    return percentage

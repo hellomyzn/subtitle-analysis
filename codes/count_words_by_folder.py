@@ -31,6 +31,10 @@ def main():
         manipulate.export_csv(word_times, file, "word_and_times")
         manipulate.export_txt(noises, file, "noises")
         manipulate.export_txt(words_without_noises, file, "words")
+
+        print("NOISES:               " + str(len(noises)))
+        print("WORDS_WITHOUT_NOISES: " + str(len(words_without_noises)))
+        print("WORD_AND_TIMES:       " + str(len(word_times)))
         print("DONE:                 " + file + line)
 
     print(line + "START:                all-words")
