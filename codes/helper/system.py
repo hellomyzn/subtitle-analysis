@@ -22,5 +22,4 @@ def get_files_name(folder_path):
 
 
 def make_dir(path, dir_name):
-    folder_path = "./data/"
     os.mkdir(path + dir_name)

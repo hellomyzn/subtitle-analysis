@@ -14,7 +14,6 @@ def extract_words(file_path, words):
         exit()
 
 
-
 def remove_noises(words, words_without_noises, noises):
     words = [word.replace("'", '') for word in words]
     words = [word.replace('"', '') for word in words]
@@ -41,14 +40,19 @@ def remove_noises(words, words_without_noises, noises):
     return words_without_noises, noises
 
 
-
-
-
 def export_csv(word_times, file_name, folder_path):
     file_name = file_name + ".csv"
     with open("./data/" + folder_path + "/" + file_name, "w") as f:
         writer = csv.writer(f, lineterminator="\n")
         writer.writerows(word_times)
+
+
+def import_txt(file_path):
+    words = []
+    with open(file_path, "r") as f:
+        for line in f:
+            words += line.split()
+    return words
 
 
 def export_txt(noises, file_name, folder_path):

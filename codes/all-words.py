@@ -2,61 +2,45 @@ import sys
 import os
 import csv
 
-import count_words
+from helper import calculate
+from helper import manipulate
+from helper import system
 
 
 def main():
     words = []
+    word_and_times = []
+
     # get folder path
-    folder_path = count_words.get_args(1)
+    words_folder_path = "./data/words/"
 
     # get files in the folder
-    files = count_words.get_files_name(folder_path)
+    words_files = system.get_files_name(words_folder_path)
 
     # get words from files
-    for file in files:
-        file_path = folder_path + file
-        get_csv_data(file_path, words)
-    print(words)
+    for file in words_files:
+        file_path = words_folder_path + file
+        words.extend(manipulate.import_txt(file_path))
 
+    word_and_times = calculate.count_words(words)
+    # system.make_dir("./data/", "all-words")
+    manipulate.export_csv(word_and_times, "word_and_times", "all-words")
+    words_by_frequency = calculate.count_words_by_frequency(10, word_and_times)
 
-
-    # all_word_times = []
-    # total_words = 0
-    # one_time = []
-    # two_times = []
-    # more_than_three_times = []
-    # more_than_five_times = []
-    # more_than_ten_times = []
+    for (k,v) in words_by_frequency.items():
+        print(k + ": " + str(len(v)))
+    
+    print("all: " + str(len(words)))
+    
     
 
     
-    # total_words = aggregate_words(
-    #         all_word_times, 
-    #         total_words,
-    #         one_time, two_times, 
-    #         more_than_three_times, 
-    #         more_than_five_times, 
-    #         more_than_ten_times)
-    # print(total_words)
-    # print("ALL-WORDS:               " + str(len(all_word_times)))
-    # print("ONE TIME:                " + str(len(one_time)) + " (" + str(cal_percentage(len(all_word_times), len(one_time))) + ")")
+# print("ONE TIME:                " + str(len(one_time)) + " (" + str(cal_percentage(len(all_word_times), len(one_time))) + ")")
     # print("TWO TIMES:               " + str(len(two_times)) + " (" + str(cal_percentage(len(all_word_times), len(two_times))) + ")")
     # print("MORE THAN THREE TIMES:   " + str(len(more_than_three_times)) + " (" + str(cal_percentage(len(all_word_times), len(more_than_three_times))) + ")")
     # print("MORE THAN FIVE TIMES:    " + str(len(more_than_five_times)) + " (" + str(cal_percentage(len(all_word_times), len(more_than_five_times))) + ")")
     # print("MORE THAN TEN TIMES:     " + str(len(more_than_ten_times)) + " (" + str(cal_percentage(len(all_word_times), len(more_than_ten_times))) + ")")
 
-
-
-
-def get_csv_data(file_path, words):
-    with open (file_path, 'r') as f:
-        reader = csv.reader(f)
-        # skip header of csv
-        header = next(reader) 
-
-        for line in reader:
-            words.append(line)
 
 
 def aggregate_words(all_word_times, 
