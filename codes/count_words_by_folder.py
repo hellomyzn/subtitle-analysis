@@ -10,7 +10,7 @@ def main():
     files = count_words.get_files_name(folder_path)
     count_words.make_dir("word_and_times")
     count_words.make_dir("words")
-    
+    count_words.make_dir("noises")
 
     for file in files:
         words = []
@@ -27,7 +27,7 @@ def main():
 
         word_times = count_words.count_words(words_without_noises)
         count_words.export_csv(word_times, file, "word_and_times")
-        count_words.export_noises(noises, file)
+        count_words.export_txt(noises, file, "noises")
         print("DONE:                 " + file + line)
 
     print(line + "START:                all-words")

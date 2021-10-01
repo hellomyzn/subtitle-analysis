@@ -78,7 +78,7 @@ def export_csv(word_times, file_name, folder_path):
         writer.writerows(word_times)
 
 
-def export_noises(noises, file_name):
-    file_name = file_name + "-noise.csv"
-    with open("./noises/" + file_name, "w") as f:
+def export_txt(noises, file_name, folder_path):
+    file_name = file_name + ".txt"
+    with open("./data/" + folder_path + "/" + file_name, "w") as f:
         f.write('\n'.join(noises))
