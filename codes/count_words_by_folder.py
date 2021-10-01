@@ -1,4 +1,6 @@
-import count_words
+from helper import calculate
+from helper import manipulate
+from helper import system
 
 
 def main():
@@ -6,11 +8,11 @@ def main():
     all_words = []
     line = "\n***********************************************************************\n"
 
-    folder_path = count_words.get_args(1)
-    files = count_words.get_files_name(folder_path)
-    count_words.make_dir("word_and_times")
-    count_words.make_dir("words")
-    count_words.make_dir("noises")
+    folder_path = system.get_args(1)
+    files = system.get_files_name(folder_path)
+    system.make_dir("./data/", "word_and_times")
+    system.make_dir("./data/", "words")
+    system.make_dir("./data/", "noises")
 
     for file in files:
         words = []
@@ -21,18 +23,17 @@ def main():
 
         print(line + "START:                " + file)
 
-        words = count_words.extract_words(file_path, words)
-        words_without_noises, noises = count_words.remove_noises(words, words_without_noises, noises)
+        words = manipulate.extract_words(file_path, words)
+        words_without_noises, noises = manipulate.remove_noises(words, words_without_noises, noises)
         all_words.extend(words_without_noises)
 
-        word_times = count_words.count_words(words_without_noises)
-        count_words.export_csv(word_times, file, "word_and_times")
-        count_words.export_txt(noises, file, "noises")
-        count_words.export_txt(words_without_noises, file, "words")
+        word_times = calculate.count_words(words_without_noises)
+        manipulate.export_csv(word_times, file, "word_and_times")
+        manipulate.export_txt(noises, file, "noises")
+        manipulate.export_txt(words_without_noises, file, "words")
         print("DONE:                 " + file + line)
 
     print(line + "START:                all-words")
-    all_word_times = count_words.count_words(all_words)
     print("ALL-WORDS:            " + str(len(all_words)))
     print("DONE:                 all-words" + line)
 
