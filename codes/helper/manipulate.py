@@ -37,15 +37,22 @@ def remove_noises(words, words_without_noises, noises):
 def remove_subject(words):
     removed_words = {}
 
-    subjects_pronouns = ["i", "you", "he", "she", "it", "they", "that", "these", "those", "we"]
+    subjects_pronouns = ["i", "you", "he", "she", "it", "they", "this",  "that", "there",  "these", "those", "we", "im", "ive", "shes", "hes",  "youre", "thats", "theres", "theyre", "youll", "youd", "youve", "shell"]
     objects_pronouns =  ["me", "him", "her", "them", "us"]
     possessives_adjectives =  ["my", "your", "his", "its", "our", "their"]
     possessives_pronouns = ["mine", "yours", "hers" "yours", "ours", "theirs"]
     reflexive_pronoun = ["myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
     articles = ["a", "an", "the"]
-    interjections = [ "ah", "aha", "aw", "awesome", "aww", "boy", "man", "bye", "cheers", "cool", "gosh", "eh", "hi", "ha", "hey", "hello", "hmm", "huh", "nope", "oh", "ok", "okay", "ow", "ouch", "please", "shh", "well", "please", "wow", "yeah"]
+    interjections = [ "ah", "aha", "aw", "awesome", "aww", "boy", "man", "bye", "cheers", "cool", "gosh", "eh", "hi", "ha", "hey", "hello", "hmm", "huh", "nope", "oh", "ok", "okay", "ow", "ouch", "please", "shh", "uh", "um", "well", "please", "wow", "yeah", "ooh", "heh", "whoa", "ahem", "mr", "dr", "uhhuh", "mm", "ugh", "mmhm", "la", "ew", "uhoh"]
+    prepositions = ["about", "after", "around", "as", "at", "before", "between", "but", "by", "down", "for", "from", "in", "into", "like", "of", "off", "on", "outside", "over", "since", "than", "to", "under", "until", "up", "with", "without"]
+    conjunction = ["if", "because", "even", "once", "only", "so", "then", "while", "and", "or"]
+    interrogative = ["what", "whatever", "which", "whichever", "who", "whoever", "whom", "whomever", "whose", "whom", "whats", "where", "how", "whos"]
+    be_verbs = ["be", "is", "are", "am", "was", "were", "wasnt", "isnt", "arent"]
+    etc = ["yes", "no", "not"]
+    names = ["rachel", "monica", "joey", "phoebe", "marcel", "ross", "carol", "susan", "janice", "paolo", "ben", "paul", "bob", "helen", "aah", "joeys"]
+    
 
-    remove_words = subjects_pronouns + objects_pronouns + possessives_adjectives + possessives_pronouns + reflexive_pronoun + articles + interjections
+    remove_words = subjects_pronouns + objects_pronouns + possessives_adjectives + possessives_pronouns + reflexive_pronoun + articles + interjections + prepositions + conjunction + interrogative + be_verbs + etc + names
 
     for i in range(1, len(words) + 1):
         removed_words[str(i)] = [word for word in words[str(i)] if word[0] not in remove_words]

@@ -48,7 +48,9 @@ def main():
     print("DONE:     " + "words" + line)
 
 
+    ################################################################################
     removed_words = manipulate.remove_subject(words_by_frequency)
+    
 
     print(line + "START:    " + "removed_word_and_times")
     print("ALL:      " + str(len(all_word_and_times)))
@@ -56,6 +58,7 @@ def main():
         percentage = calculate.percentage_of_words(len(all_word_and_times), len(data))
         print(frequency + ":        " + str(len(data)) + " (" + str(percentage) + "%)" )
     print("DONE:     " + "word_and_times" + line)
+
 
     print(line + "START:    " + "removed_words")
     print("ALL:      " + str(len(all_words)))
@@ -67,6 +70,8 @@ def main():
         print(frequency + ":        " + str(times) + " (" + str(percentage) + "%)" )
     print("DONE:     " + "words" + line)
 
-    
+    for frequency, words in removed_words.items():
+        manipulate.export_csv(words, "words_by_frequency" + str(frequency), "all-words")
+
 if __name__ == "__main__":
     main()
