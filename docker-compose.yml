@@ -1,10 +1,26 @@
-version: '3'
+version: '3.6'
 services:
-  python3:
+  python:
+    build:
+      context: .
+      dockerfile: ./infra/docker/python/Dockerfile
+    container_name: 'python'
+    hostname: 'python'
+    working_dir: '/opt/work/'
     restart: always
-    build: ./infra/python/
-    container_name: 'python3'
-    working_dir: '/root/'
     tty: true
     volumes:
-      - ./backend/:/root
+      - type: bind
+        source: ./src
+        target: /opt/work
+      - type: bind
+        source: ./docs
+        target: /opt/docs
+    environment:
+      - TZ=Asia/Tokyo
+      - LOG_LEVEL=INFO
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
