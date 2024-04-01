@@ -3,6 +3,7 @@
 # Builtin packages
 #########################################################
 import os
+import pathlib
 
 #########################################################
 # 3rd party packages
@@ -41,3 +42,21 @@ def get_file_path(dir_path):
                  dir_path)
     path = f"{dir_path}/{file_name}"
     return path
+
+
+def has_file(path: str) -> bool:
+    return os.path.isfile(path)
+
+
+def make_file(path: str) -> None:
+    try:
+        path, extension = path.split(".")
+        dir_path = "/".join(path.split("/")[:-1])
+    except ValueError:
+        extension = None
+
+    if not os.path.isdir(dir_path):
+        os.makedirs(dir_path)
+
+    if extension:
+        pathlib.Path(f"{path}.{extension}").touch()
