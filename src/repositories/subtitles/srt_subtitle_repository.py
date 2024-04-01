@@ -14,11 +14,9 @@ from dataclasses import dataclass, field
 #########################################################
 # Own packages
 #########################################################
-from common.config import Config
+from common.config import SUBS_PATH
 from common.log import info
 from utils import get_file_path
-
-config = Config().config
 
 
 @dataclass
@@ -27,9 +25,7 @@ class SrtSubtitleRepository(object):
     path: str = field(init=False, default=None)
 
     def __init__(self):
-        target_path = config["SUBS"]["PATH"]
-        dir_path = f"/opt/work/src/subtitles/{target_path}"
-        path = get_file_path(dir_path)
+        path = get_file_path(SUBS_PATH)
         self.path = path
 
     def get(self) -> list[dict[int, str],]:
