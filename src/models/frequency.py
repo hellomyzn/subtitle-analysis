@@ -1,4 +1,4 @@
-"""models.part of speech"""
+"""models.vocabulary"""
 #########################################################
 # Builtin packages
 #########################################################
@@ -17,12 +17,11 @@ from models import Model
 
 
 @dataclass
-class PartOfSpeech(Model):
-    """part of speech data class"""
-    unique_vocab_count: int | None = field(init=True, default=0)
-    total_vocab_count: int | None = field(init=True, default=0)
-    vocabularies: list | None = field(init=True, default_factory=list)
-    frequency: list | None = field(init=True, default_factory=list)
+class Frequency(Model):
+    """vocabulary data class"""
+    id: int | None = field(init=True, default=None)
+    vocabulary: str | None = field(init=True, default=None)
+    frequency: int | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -35,9 +34,8 @@ class PartOfSpeech(Model):
             Sample: model
         """
         return cls(**{
-            "unique_vocab_count": dict_.get("unique_vocab_count"),
-            "total_vocab_count": dict_.get("total_vocab_count"),
-            "vocabularies": dict_.get("vocabularies"),
+            "id": dict_.get("id"),
+            "vocabulary": dict_.get("vocabulary"),
             "frequency": dict_.get("frequency")})
 
     def to_dict(self, without_none_field: bool = False) -> dict:
@@ -50,9 +48,8 @@ class PartOfSpeech(Model):
             dict: dict data
         """
         dict_ = {
-            "unique_vocab_count": self.unique_vocab_count,
-            "total_vocab_count": self.total_vocab_count,
-            "vocabularies": self.vocabularies,
+            "id": self.id,
+            "vocabulary": self.vocabulary,
             "frequency": self.frequency}
 
         if without_none_field:
