@@ -1,10 +1,13 @@
-# docker-python-handson
-This is a my own broiler template for python.
-- [docker-python-handson](#docker-python-handson)
+# Subtitle analysis
+This is for subtitle analysis.
+- [Subtitle analysis](#subtitle-analysis)
     - [docker commands](#docker-commands)
     - [start](#start)
     - [containers](#containers)
     - [vscode settings](#vscode-settings)
+    - [References](#references)
+      - [NLTK](#nltk)
+      - [Subtitles](#subtitles)
 
 ### docker commands
 ```bash
@@ -51,3 +54,13 @@ How do I press and hold a key and have it repeat in VSCode?
 ```bash
 $ defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 ```
+
+### References
+#### NLTK
+- [英語の文章から自動で、単語帳を生成するプログラムを作ってみた](https://qiita.com/ryoheiroi/items/f443e2aaafebb042d189)
+- [NLTKの使い方をいろいろ調べてみた](https://qiita.com/m__k/items/ffd3b7774f2fde1083fa)
+- [Python 3: NLTKを用いた自然言語処理](https://qiita.com/KentOhwada_AlibabaCloudJapan/items/3c9130a2a28498baf93f)
+#### Subtitles
+- [Subtitleseeker](https://subtitleseeker.in/)
+- [YTS Subs](https://yts-subs.com/)
+- [TVsubs](https://www.tvsubs.net/)
