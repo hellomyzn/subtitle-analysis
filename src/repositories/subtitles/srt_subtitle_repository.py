@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 #########################################################
 from common.config import SUBS_PATH
 from common.log import info
+from models import Sentence
 from utils import get_file_path
 
 
@@ -39,11 +40,11 @@ class SrtSubtitleRepository(object):
             lines = file.readlines()
 
         # format
-        sentences = self.__format(lines)
+        sentences = self.__parse_to_sentence(lines)
         info("get subtitles successfully. lines: {0}", len(sentences))
         return sentences
 
-    def __format(self, lines: list) -> list:
+    def __parse_to_sentence(self, lines: list) -> list:
         """format subtitles
 
         Args:
@@ -62,10 +63,10 @@ class SrtSubtitleRepository(object):
             first_letter = line[0]
             if first_letter.islower():
                 previous_line = sentences[-1]
-                previous_line["sentence"] += f" {line}"
+                previous_line.sentence += f" {line}"
                 continue
 
-            sentence = {"id": id_, "sentence": str(line)}
+            sentence = Sentence(id=id_, sentence=str(line))
             sentences.append(sentence)
             id_ += 1
         return sentences
