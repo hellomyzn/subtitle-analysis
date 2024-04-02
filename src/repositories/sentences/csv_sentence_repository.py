@@ -13,7 +13,9 @@
 # Own packages
 #########################################################
 from common.config import SENTENCE_PATH, TARGET_PATH
+from models import Sentence
 from repositories import CsvBaseRepository
+from repositories import ModelAdapter
 from utils import has_file, make_file
 
 
@@ -23,6 +25,9 @@ class CsvSentenceRepository(CsvBaseRepository):
     KEY_ID = "id"
     KEY_SENTENCE = "sentence"
     HEADER = [KEY_ID, KEY_SENTENCE]
+    adapter: ModelAdapter = ModelAdapter(Sentence, {
+        "id": KEY_ID,
+        "sentence": KEY_SENTENCE})
 
     def __init__(self):
         file_name = TARGET_PATH.replace("/", "_")
@@ -32,4 +37,4 @@ class CsvSentenceRepository(CsvBaseRepository):
         if not has_file(path):
             make_file(path)
 
-        super().__init__(path, self.HEADER)
+        super().__init__(path, self.HEADER, self.adapter)
