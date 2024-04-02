@@ -36,7 +36,7 @@ class CsvVocabularyRepository(CsvBaseRepository):
     def __init__(self):
         file_name = TARGET_PATH.replace("/", "_")
         extension = ".csv"
-        path = f"{VOCABULARY_PATH}/vocabulary_{file_name}{extension}"
+        path = f"{VOCABULARY_PATH}/pos/vocabulary_{file_name}{extension}"
         if not has_file(path):
             make_file(path)
         super().__init__(path, self.HEADER, self.adapter)
