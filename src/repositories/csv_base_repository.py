@@ -15,12 +15,10 @@ from dataclasses import dataclass, field
 #########################################################
 # Own packages
 #########################################################
-from common.log import (
-    error,
-    warn,
-    info
-)
+from common.log import error, warn, info
+from models import Model
 from repositories import BaseRepositoryInterface
+from repositories import ModelAdapter
 
 
 @dataclass
@@ -29,6 +27,7 @@ class CsvBaseRepository(BaseRepositoryInterface):
 
     path: str = field(init=True, default=None)
     header: list = field(init=True, default_factory=list)
+    adapter: ModelAdapter = field(init=True, default=None)
 
     def all(self) -> list:
         """get all data from csv
@@ -46,6 +45,15 @@ class CsvBaseRepository(BaseRepositoryInterface):
 
     def find_by_id(self, id_: int) -> dict:
         pass
+
+    def write(self, data: list[Model,]) -> None:
+
+        with open(file=self.path, mode="w", encoding="utf-8", newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.header)
+            writer.writeheader()
+            for model in data:
+                dict_ = self.adapter.from_model(model)
+                writer.writerow(dict_)
 
     def add(self, data: dict) -> None:
         """add data into the csv file
