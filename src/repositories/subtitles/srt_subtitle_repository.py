@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 #########################################################
 from common.config import SUBS_PATH
 from common.log import info
-from models import Sentence
+from models import Subtitle
 from utils import get_file_path
 
 
@@ -66,7 +66,7 @@ class SrtSubtitleRepository(object):
                 previous_line.sentence += f" {line}"
                 continue
 
-            sentence = Sentence(id=id_, sentence=str(line))
+            sentence = Subtitle(id=id_, sentence=str(line))
             sentences.append(sentence)
             id_ += 1
         return sentences

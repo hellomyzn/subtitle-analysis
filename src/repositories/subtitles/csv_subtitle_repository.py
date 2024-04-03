@@ -12,27 +12,27 @@
 #########################################################
 # Own packages
 #########################################################
-from common.config import SENTENCE_PATH, TARGET_PATH
-from models import Sentence
+from common.config import SUBS_CSV_PATH, TARGET_PATH
+from models import Subtitle
 from repositories import CsvBaseRepository
 from repositories import ModelAdapter
 from utils import has_file, make_file
 
 
-class CsvSentenceRepository(CsvBaseRepository):
+class CsvSubtitleRepository(CsvBaseRepository):
     """csv sentence repository"""
 
     KEY_ID = "id"
     KEY_SENTENCE = "sentence"
     HEADER = [KEY_ID, KEY_SENTENCE]
-    adapter: ModelAdapter = ModelAdapter(Sentence, {
+    adapter: ModelAdapter = ModelAdapter(Subtitle, {
         "id": KEY_ID,
         "sentence": KEY_SENTENCE})
 
     def __init__(self):
         file_name = TARGET_PATH.replace("/", "_")
         extension = ".csv"
-        path = f"{SENTENCE_PATH}/sentence_{file_name}{extension}"
+        path = f"{SUBS_CSV_PATH}/subtitle_{file_name}{extension}"
 
         if not has_file(path):
             make_file(path)

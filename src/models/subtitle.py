@@ -17,7 +17,7 @@ from models import Model
 
 
 @dataclass
-class Sentence(Model):
+class Subtitle(Model):
     """sentence data class"""
     id: int | None = field(init=True, default=None)
     sentence: str | None = field(init=True, default=None)
