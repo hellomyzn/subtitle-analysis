@@ -21,7 +21,7 @@ class Frequency(Model):
     """vocabulary data class"""
     id: int | None = field(init=True, default=None)
     vocabulary: str | None = field(init=True, default=None)
-    frequency: int | None = field(init=True, default=None)
+    times: int | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -36,7 +36,7 @@ class Frequency(Model):
         return cls(**{
             "id": dict_.get("id"),
             "vocabulary": dict_.get("vocabulary"),
-            "frequency": dict_.get("frequency")})
+            "times": dict_.get("times")})
 
     def to_dict(self, without_none_field: bool = False) -> dict:
         """convert from model to dict
@@ -50,7 +50,7 @@ class Frequency(Model):
         dict_ = {
             "id": self.id,
             "vocabulary": self.vocabulary,
-            "frequency": self.frequency}
+            "times": self.times}
 
         if without_none_field:
             return {key: value for key, value in dict_.items() if value is not None}
