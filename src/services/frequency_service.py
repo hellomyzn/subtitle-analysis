@@ -70,7 +70,7 @@ class FrequencyService(object):
 
     @exception_module
     def get_adverbs(self):
-        poss = ["RB", "RBR", "RBS"]
+        poss = ["RB", "RBR", "RBS", "RP"]
         adverbs = self.__get_lemmatized_freqs(poss, "r")
         return adverbs
 
@@ -92,6 +92,11 @@ class FrequencyService(object):
         for pos in poss:
             freq_from_repo = self.get_by_pos(pos)
             freqs.extend(freq_from_repo)
+        return freqs
+
+    @exception_module
+    def get_by_pos(self, pos: str) -> list[Frequency, ]:
+        freqs = self.csv_repo.get_by_pos(pos)
         return freqs
 
     @staticmethod
@@ -126,8 +131,3 @@ class FrequencyService(object):
             id_ += 1
 
         return freqs_list
-
-    @exception_module
-    def get_by_pos(self, pos: str) -> list[Frequency, ]:
-        freqs = self.csv_repo.get_by_pos(pos)
-        return freqs
