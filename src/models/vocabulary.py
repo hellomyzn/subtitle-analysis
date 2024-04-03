@@ -20,9 +20,9 @@ from models import Model
 class Vocabulary(Model):
     """vocabulary data class"""
     id: int | None = field(init=True, default=None)
-    vocabulary: str | None = field(init=True, default=None)
+    english: str | None = field(init=True, default=None)
     pos: str | None = field(init=True, default=None)
-    sentence_id: str | None = field(init=True, default=None)
+    subject_id: str | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -36,9 +36,9 @@ class Vocabulary(Model):
         """
         return cls(**{
             "id": dict_.get("id"),
-            "vocabulary": dict_.get("vocabulary"),
+            "english": dict_.get("english"),
             "pos": dict_.get("pos"),
-            "sentence_id": dict_.get("sentence_id")
+            "subject_id": dict_.get("subject_id")
         })
 
     def to_dict(self, without_none_field: bool = False) -> dict:
@@ -52,9 +52,9 @@ class Vocabulary(Model):
         """
         dict_ = {
             "id": self.id,
-            "vocabulary": self.vocabulary,
+            "english": self.english,
             "pos": self.pos,
-            "sentence_id": self.sentence_id
+            "subject_id": self.subject_id
         }
 
         if without_none_field:

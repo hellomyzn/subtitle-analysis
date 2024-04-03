@@ -46,9 +46,11 @@ class CsvBaseRepository(BaseRepositoryInterface):
     def find_by_id(self, id_: int) -> dict:
         pass
 
-    def write(self, data: list[Model,]) -> None:
+    def write(self, data: list[Model,], path: str | None = None) -> None:
+        if path is None:
+            path = self.path
 
-        with open(file=self.path, mode="w", encoding="utf-8", newline='') as csvfile:
+        with open(file=path, mode="w", encoding="utf-8", newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self.header)
             writer.writeheader()
             for model in data:
