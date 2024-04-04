@@ -38,6 +38,14 @@ class ModelAdapter(object):
                 result[repo_key] = value
         return result
 
+    def from_model_to_list(self, model: Model) -> list:
+        result = []
+        for _, key in self.key_map.items():
+            value = getattr(model, key)
+            result.append(value)
+
+        return result
+
     def to_model(self, data_from_db: dict) -> Model:
         result = {}
         for repo_key, key in self.key_map.items():

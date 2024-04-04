@@ -3,7 +3,7 @@
 # Builtin packages
 #########################################################
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 #########################################################
 # 3rd party packages
@@ -14,14 +14,14 @@ import gspread
 # Own packages
 #########################################################
 from common.config import Config
+from common.decorator import gss_module
+from common.exceptions import (MyGssException,
+                               MyGssInvalidArgumentException,
+                               MyGssResourceExhaustedException)
 from common.google_spreadsheet import GssAccessor
-from common.log import (
-    error,
-    warn,
-    info
-)
+from common.log import warn, info, debug
+from models import Model
 from repositories import BaseRepositoryInterface
-from requests.exceptions import ConnectionError
 
 
 CONFIG = Config().config
@@ -32,16 +32,10 @@ SHEET_KEY = CONFIG["GSS"]["SHEET_KEY"]
 class GssBaseRepository(BaseRepositoryInterface):
     """gss base repository"""
 
-    SHEET_SIZE_ERR_STATUS = "INVALID_ARGUMENT"
-    REQUEST_LIMIT_ERR_STATUS = "RESOURCE_EXHAUSTED"
-    ROW_NUM_TO_ADD = 1000
-
-    sheet_name: gspread = field(init=False, default=None)
-    columns: list = field(init=False, default_factory=list)
-
-    def __init__(self, sheet_name, columns):
+    def __init__(self, sheet_name, columns, adapter):
         self.sheet_name = sheet_name
         self.columns = columns
+        self.adapter = adapter
         gss = GssAccessor()
         workbook = gss.connection.open_by_key(SHEET_KEY)
         self.worksheet = workbook.worksheet(sheet_name)
@@ -55,64 +49,48 @@ class GssBaseRepository(BaseRepositoryInterface):
     def find_by_id(self, id_: int) -> dict:
         pass
 
-    def add(self, data: dict) -> None:
+    @gss_module
+    def add(self, data: list[Model, ]) -> None:
         """_summary_
 
         Args:
-            data (dict): _description_
+            data (list[Model, ]): _description_
 
         Raises:
-            gspread.exceptions.APIError: _description_
-            ConnectionError: _description_
+            MyGssInvalidArgumentException: _description_
+            MyGssResourceExhaustedException: _description_
+            MyGssException: _description_
         """
-        values = list(data.values())
-        attempts = 1
-        max_attempts = 3
+        inputs = []
 
-        while attempts <= max_attempts:
-            try:
-                row_num = self.__find_next_available_row()
-                self.worksheet.insert_row(values, row_num)
-            except ConnectionError as err:
-                attempts += 1
-                is_connection_err = True
-                warn("connection error. {0}: {1}", err.__class__.__name__, err)
-                time.sleep(30)
-            except gspread.exceptions.APIError as err:
-                err_status = err.response.json()["error"]["status"]
-                is_sheet_size_err = bool(err_status == self.SHEET_SIZE_ERR_STATUS)
-                is_request_limit = bool(err_status == self.REQUEST_LIMIT_ERR_STATUS)
+        for model in data:
+            input_ = self.adapter.from_model_to_list(model)
+            inputs.append(input_)
 
-                if is_sheet_size_err:
-                    # no row to add new data in the sheet.
-                    warn("sheet size(row) is not enough. {0}: {1}", err.__class__.__name__, err)
-                    time.sleep(10)
-                    self.worksheet.add_rows(self.ROW_NUM_TO_ADD)
-                    info("added {0} rows in the sheet({1})", self.ROW_NUM_TO_ADD, self.sheet_name)
-                elif is_request_limit:
-                    # request quota exceeded the limit
-                    warn("request quota exceeded the limit. {0}: {1}", err.__class__.__name__, err)
-                    time.sleep(60)
-                else:
-                    attempts += 1
-                    mes = ("failed to add data into gss 3 times. ",
-                           "please check the log. "
-                           f"{err.__class__.__name__}: {err}")
-                    error(mes)
-                    raise gspread.exceptions.APIError(mes)
-            else:
-                # success
-                info("added data in the gss({0}).", self.sheet_name)
-                is_connection_err = False
-                break
-
-        if is_connection_err:
-            mes = ("failed to connect to gss 3 times. ",
-                   "please check your internet connection.")
-            error(mes)
-            raise ConnectionError(mes)
-
-        time.sleep(1)
+        row_num = self.__find_next_available_row()
+        try:
+            debug("data: {0}, row_num: {1}", len(inputs), row_num)
+            self.worksheet.insert_rows(inputs, row_num)
+        except gspread.exceptions.APIError as exc:
+            err_status = exc.response.json()["error"]["status"]
+            is_sheet_size_err = bool(err_status == "INVALID_ARGUMENT")
+            is_request_limit = bool(err_status == "RESOURCE_EXHAUSTED")
+            if is_sheet_size_err:
+                # no row to add new data in the sheet.
+                warn("sheet size(row) is not enough. {0}: {1}",
+                     exc.__class__.__name__, exc)
+                rows_to_add = 1000
+                self.worksheet.add_rows(rows_to_add)
+                info("added {0} rows in the sheet({1})", rows_to_add, self.sheet_name)
+                raise MyGssInvalidArgumentException(exc) from exc
+            if is_request_limit:
+                # request quota exceeded the limit
+                warn("gspread api error: request quota exceeded the limit. {0}: {1}",
+                     exc.__class__.__name__, exc)
+                raise MyGssResourceExhaustedException(exc) from exc
+            warn("gspread api error: please check log out. {0}: {1}",
+                 exc.__class__.__name__, exc)
+            raise MyGssException(exc) from exc
 
     def delete_by_id(self, id_: int) -> None:
         pass

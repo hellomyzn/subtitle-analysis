@@ -16,6 +16,7 @@ from common.decorator import exception_module
 from models import Subtitle
 from repositories.subtitles import SrtSubtitleRepository
 from repositories.subtitles import CsvSubtitleRepository
+from repositories.subtitles import GssSubtitleRepository
 
 
 @dataclass
@@ -25,6 +26,7 @@ class SubtitleService(object):
     def __init__(self):
         self.srt_repo = SrtSubtitleRepository()
         self.csv_repo = CsvSubtitleRepository()
+        self.gss_repo = GssSubtitleRepository()
 
     @exception_module
     def get_from_srt(self) -> list[Subtitle, ]:
@@ -44,3 +46,12 @@ class SubtitleService(object):
             subs (list[Subtitle, ]): subtitles
         """
         self.csv_repo.write(subs)
+
+    @exception_module
+    def write_gss(self, subs: list[Subtitle, ]) -> None:
+        """write subtitle on gss
+
+        Args:
+            subs (list[Subtitle, ]): subtitles
+        """
+        self.gss_repo.add(subs)
