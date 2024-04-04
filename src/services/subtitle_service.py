@@ -2,8 +2,7 @@
 #########################################################
 # Builtin packages
 #########################################################
-import csv
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 #########################################################
 # 3rd party packages
@@ -17,8 +16,6 @@ from common.decorator import exception_module
 from models import Subtitle
 from repositories.subtitles import SrtSubtitleRepository
 from repositories.subtitles import CsvSubtitleRepository
-from repositories.vocabularies import CsvVocabularyRepository
-from repositories.frequencies import CsvFrequencyRepository
 
 
 @dataclass
