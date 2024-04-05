@@ -29,6 +29,11 @@ class SubtitleService(object):
         self.gss_repo = GssSubtitleRepository()
 
     @exception_module
+    def add(self, subs: list[Subtitle, ]) -> None:
+        self.write_csv(subs)
+        self.write_gss(subs)
+
+    @exception_module
     def get_from_srt(self) -> list[Subtitle, ]:
         """get subtitles from srt file
 
