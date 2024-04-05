@@ -18,6 +18,7 @@ from common.decorator import exception_module
 from models import Vocabulary
 from models import Frequency
 from repositories.frequencies import CsvFrequencyRepository
+from repositories.frequencies import GssFrequencyRepository
 from utils import has_file, make_file
 
 
@@ -27,6 +28,7 @@ class FrequencyService(object):
 
     def __init__(self):
         self.csv_repo = CsvFrequencyRepository()
+        self.gss_repo = GssFrequencyRepository()
 
     @exception_module
     def calculate_vocab_frequencies(self, vocabs: list[Vocabulary,]) -> list[Frequency, ]:
@@ -44,6 +46,11 @@ class FrequencyService(object):
         return freqs
 
     @exception_module
+    def add(self, freqs: list[Frequency, ]):
+        self.write_csv(freqs)
+        self.write_gss(freqs)
+
+    @exception_module
     def write_csv(self, freqs: list[Frequency, ], output_path: str | None = None) -> None:
         if output_path:
             path = self.csv_repo.path
@@ -55,6 +62,61 @@ class FrequencyService(object):
                 make_file(output_path)
 
         self.csv_repo.write(freqs, path=output_path)
+
+    @exception_module
+    def write_gss(self, freqs: list[Frequency, ]) -> None:
+        self.gss_repo.add(freqs)
+
+    @exception_module
+    def add_by_pos(self, vocabs: list[Vocabulary, ]) -> None:
+        poss = ["CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS",
+                "LS", "MD", "NN", "NNS", "NNP", "NNPS", "PDT", "POS",
+                "PRP", "PRP$", "RB", "RBR", "RBS", "RP", "SYM", "TO",
+                "UH", "VB", "VBD", "VBG", "VBN", "VBP", "VBZ", "WDT",
+                "WP", "WP$", "WRB"]
+        for pos in poss:
+            output_path = f"/pos/{pos}"
+            vocabs_pos = self.__extract_by_pos(vocabs, pos)
+            freqs_pos = self.calculate_vocab_frequencies(vocabs_pos)
+            self.write_csv(freqs_pos, output_path=output_path)
+
+    @staticmethod
+    def __extract_by_pos(vocabularies: list[Vocabulary,], pos: str) -> list[Vocabulary,]:
+        vocabs_pos = []
+        for vocab in vocabularies:
+            if vocab.pos == pos:
+                vocabs_pos.append(vocab)
+
+        return vocabs_pos
+
+    @exception_module
+    def add_result(self):
+        funcs = {
+            "verb": self.get_verbs,
+            "adjective": self.get_adjectives,
+            "adverb": self.get_adverbs,
+            "noun": self.get_nouns}
+
+        result_dict = {}
+        for path, func in funcs.items():
+            freqs = func()
+            self.write_csv(freqs, output_path=path)
+            for freq in freqs:
+                vocab = freq.vocabulary
+                times = int(freq.times)
+                try:
+                    result_dict[vocab] += times
+                except KeyError:
+                    result_dict[vocab] = times
+
+        sorted_dict = dict(sorted(result_dict.items(),
+                                  key=lambda freq: freq[1],
+                                  reverse=True))
+        freqs = self.__modelize_from_lemmatized_freqs(sorted_dict)
+
+        self.write_csv(freqs, output_path="result")
+        repo = GssFrequencyRepository(sheet_name="result")
+        repo.add(freqs)
 
     @exception_module
     def get_verbs(self):
@@ -120,7 +182,7 @@ class FrequencyService(object):
         return sorted_dict
 
     @staticmethod
-    def __modelize_from_lemmatized_freqs(freqs_lem: list[Frequency,]):
+    def __modelize_from_lemmatized_freqs(freqs_lem: dict[str: str],):
         freqs_list = []
         id_ = 1
         for vocab, times in freqs_lem.items():
