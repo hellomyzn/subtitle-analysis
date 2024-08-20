@@ -24,10 +24,14 @@ class CsvSubtitleRepository(CsvBaseRepository):
 
     KEY_ID = "id"
     KEY_SENTENCE = "sentence"
-    HEADER = [KEY_ID, KEY_SENTENCE]
+    KEY_TIME_FROM = "time_from"
+    KEY_TIME_TO = "time_to"
+    HEADER = [KEY_ID, KEY_SENTENCE, KEY_TIME_FROM, KEY_TIME_TO]
     adapter: ModelAdapter = ModelAdapter(Subtitle, {
         "id": KEY_ID,
-        "sentence": KEY_SENTENCE})
+        "sentence": KEY_SENTENCE,
+        "time_from": KEY_TIME_FROM,
+        "time_to": KEY_TIME_TO})
 
     def __init__(self):
         file_name = TARGET_PATH.replace("/", "_")

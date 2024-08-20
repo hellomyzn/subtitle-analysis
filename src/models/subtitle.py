@@ -21,6 +21,8 @@ class Subtitle(Model):
     """sentence data class"""
     id: int | None = field(init=True, default=None)
     sentence: str | None = field(init=True, default=None)
+    time_from: str | None = field(init=True, default=None)
+    time_to: str | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -34,7 +36,10 @@ class Subtitle(Model):
         """
         return cls(**{
             "id": dict_.get("id"),
-            "sentence": dict_.get("sentence")})
+            "sentence": dict_.get("sentence"),
+            "time_from": dict_.get("time_from"),
+            "time_to": dict_.get("time_to")
+        })
 
     def to_dict(self, without_none_field: bool = False) -> dict:
         """convert from model to dict
@@ -47,7 +52,9 @@ class Subtitle(Model):
         """
         dict_ = {
             "id": self.id,
-            "sentence": self.sentence}
+            "sentence": self.sentence,
+            "time_from": self.time_from,
+            "time_to": self.time_to}
 
         if without_none_field:
             return {key: value for key, value in dict_.items() if value is not None}

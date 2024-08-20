@@ -56,6 +56,8 @@ class SrtSubtitleRepository(object):
         sentences = []
         id_ = 1
         for line in lines:
+            if self.__is_time_range(line):
+                time_from, time_to = self.__retrieve_time_range(line)
             if self.__is_not_subtitle(line):
                 continue
             line = self.__remove_symbols(line)
@@ -66,10 +68,26 @@ class SrtSubtitleRepository(object):
                 previous_line.sentence += f" {line}"
                 continue
 
-            sentence = Subtitle(id=id_, sentence=str(line))
+            sentence = Subtitle(id=id_, sentence=str(line), time_from=time_from, time_to=time_to)
             sentences.append(sentence)
             id_ += 1
         return sentences
+
+    @staticmethod
+    def __is_time_range(line: str) -> bool:
+        time_pattern = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
+        return re.match(time_pattern, line)
+
+    @staticmethod
+    def __retrieve_time_range(line: str) -> tuple[str | None, str | None]:
+        time_from = None
+        time_to = None
+        time_pattern = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
+        match = re.match(time_pattern, line)
+        if match:
+            time_from = match.group(1)
+            time_to = match.group(2)
+        return time_from, time_to
 
     @staticmethod
     def __is_not_subtitle(line: str) -> bool:

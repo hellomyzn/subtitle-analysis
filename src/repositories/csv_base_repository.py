@@ -44,7 +44,14 @@ class CsvBaseRepository(BaseRepositoryInterface):
         return all_data
 
     def find_by_id(self, id_: int) -> dict:
-        pass
+        all_data = self.all()
+        for data in all_data:
+            try:
+                if int(data["id"]) == int(id_):
+                    return data
+            except KeyError:
+                return None
+        return None
 
     def write(self, data: list[Model,], path: str | None = None) -> None:
         if path is None:
