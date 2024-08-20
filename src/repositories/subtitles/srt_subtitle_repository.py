@@ -75,11 +75,29 @@ class SrtSubtitleRepository(object):
 
     @staticmethod
     def __is_time_range(line: str) -> bool:
+        """check it is time range or not
+            e.g. 00:00:52,969 --> 00:00:55,137
+
+        Args:
+            line (str): subtitle
+
+        Returns:
+            bool: if it is time range, True. but False
+        """
         time_pattern = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
         return re.match(time_pattern, line)
 
     @staticmethod
     def __retrieve_time_range(line: str) -> tuple[str | None, str | None]:
+        """ retrieve time range as from and to
+            e.g. 00:00:52,969 --> 00:00:55,137
+
+        Args:
+            line (str): subtitle
+
+        Returns:
+            tuple[str | None, str | None]: time range but if it is not, None
+        """
         time_from = None
         time_to = None
         time_pattern = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
