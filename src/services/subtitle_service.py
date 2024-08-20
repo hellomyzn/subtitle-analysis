@@ -30,6 +30,7 @@ class SubtitleService(object):
 
     @exception_module
     def add(self, subs: list[Subtitle, ]) -> None:
+        # TODO: put together csv and gss as list
         self.write_csv(subs)
         self.write_gss(subs)
 
