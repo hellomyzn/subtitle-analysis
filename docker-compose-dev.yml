@@ -70,11 +70,11 @@ services:
   #       target: /usr/local/bin/docker
   #   networks:
   #     internal_network_dev:
-  #       ipv4_address: 172.20.0.10
+  #       ipv4_address: 172.21.0.10
 
 networks:
   internal_network_dev:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/24
+        - subnet: 172.21.0.0/24
