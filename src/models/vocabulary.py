@@ -21,15 +21,15 @@ from repositories.subtitles import CsvSubtitleRepository
 class Vocabulary(Model):
     """vocabulary data class"""
     id: int | None = field(init=True, default=None)
-    english: str | None = field(init=True, default=None)
+    word: str | None = field(init=True, default=None)
     meaning: str | None = field(init=True, default=None)
     pos: str | None = field(init=True, default=None)
-    original: str | None = field(init=True, default=None)
+    original_form: str | None = field(init=True, default=None)
     level: str | None = field(init=True, default=None)
     eiken_level: str | None = field(init=True, default=None)
     school_level: str | None = field(init=True, default=None)
     toeic_level: str | None = field(init=True, default=None)
-    subject_id: str | None = field(init=True, default=None)
+    subtitle_id: str | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -43,15 +43,15 @@ class Vocabulary(Model):
         """
         return cls(**{
             "id": dict_.get("id"),
-            "english": dict_.get("english"),
+            "word": dict_.get("word"),
             "meaning": dict_.get("meaning"),
             "pos": dict_.get("pos"),
-            "original": dict_.get("original"),
+            "original_form": dict_.get("original_form"),
             "level": dict_.get("level"),
             "eiken_level": dict_.get("eiken_level"),
             "school_level": dict_.get("school_level"),
             "toeic_level": dict_.get("toeic_level"),
-            "subject_id": dict_.get("subject_id")
+            "subtitle_id": dict_.get("subtitle_id")
         })
 
     def to_dict(self, without_none_field: bool = False) -> dict:
@@ -65,15 +65,15 @@ class Vocabulary(Model):
         """
         dict_ = {
             "id": self.id,
-            "english": self.english,
+            "word": self.word,
             "meaning": self.meaning,
             "pos": self.pos,
-            "original": self.original,
+            "original_form": self.original_form,
             "level": self.level,
             "eiken_level": self.eiken_level,
             "school_level": self.school_level,
             "toeic_level": self.toeic_level,
-            "subject_id": self.subject_id
+            "subtitle_id": self.subtitle_id
         }
 
         if without_none_field:
@@ -91,13 +91,13 @@ class Vocabulary(Model):
 
     def fetch_subtitle(self) -> Subtitle:
         """
-        Retrieves the subtitle associated with the object's subject ID.
+        Retrieves the subtitle associated with the object's subtitle ID.
 
         Returns:
-            Subtitle: The subtitle corresponding to the object's subject ID, retrieved from the CSV subtitle repository.
+            Subtitle: The subtitle corresponding to the object's subtitle ID, retrieved from the CSV subtitle repository.
         """
         csv_subtitle = CsvSubtitleRepository()
-        return csv_subtitle.find_by_id(self.subject_id)
+        return csv_subtitle.find_by_id(self.subtitle_id)
 
     def find_by_attr(self, vocabs: list["Vocabulary", ], attr: str):
         """

@@ -79,22 +79,22 @@ class VocabularyService(object):
 
                 vocabulary = Vocabulary(
                     id=id_,
-                    english=word,
+                    word=word,
                     meaning=None,
                     pos=pos,
-                    original=None,
+                    original_form=None,
                     level=None,
                     eiken_level=None,
                     school_level=None,
                     toeic_level=None,
-                    subject_id=sub.id)
+                    subtitle_id=sub.id)
 
                 # Lemmatize to get the original form (e.g., studied -> study)
                 origin = VocabularyService.__lemmatize(vocabulary)
-                vocabulary.original = origin
+                vocabulary.original_form = origin
 
                 # Avoid scraping the same vocabulary by checking if it already exists
-                existing_vocab = vocabulary.find_by_attr(vocabularies, "english")
+                existing_vocab = vocabulary.find_by_attr(vocabularies, "word")
 
                 if existing_vocab:
                     vocabulary.level = existing_vocab.level
@@ -124,7 +124,7 @@ class VocabularyService(object):
             str: The original (lemmatized) form of the vocabulary, or the word itself if no lemmatization is possible.
         """
         lem = WordNetLemmatizer()
-        word = vocab.english
+        word = vocab.word
         pos_map = {
             "v": vocab.is_verb,
             "a": vocab.is_adjective,
@@ -232,11 +232,11 @@ class VocabularyService(object):
         verbs_to_exclude = ["be", "'m", "'re", "'ve", "am", "are", "is", "'s", "do"]
         for vocab in vocabs:
             # exclude aside from verbs and specific verbs
-            if not vocab.is_verb() or vocab.original in verbs_to_exclude:
+            if not vocab.is_verb() or vocab.original_form in verbs_to_exclude:
                 continue
 
             # get vocabs after the verb in the same subtitle
-            subtitle_vocabs = [v for v in vocabs if v.subject_id == vocab.subject_id]
+            subtitle_vocabs = [v for v in vocabs if v.subtitle_id == vocab.subtitle_id]
             idx = subtitle_vocabs.index(vocab)
             vocabularies_after_verb = subtitle_vocabs[idx + 1:]
 
@@ -244,29 +244,28 @@ class VocabularyService(object):
             if not vocabularies_after_verb:
                 continue
 
-            for vav in vocabularies_after_verb:
+            for next_vocab in vocabularies_after_verb:
                 # it is not phrasal verb if word which might not phrasal verb comes after the verb
-                if any([vav.is_coordinating_conjunction(),
-                        vav.is_existential_there(),
-                        vav.is_verb(),
-                        vav.english in ["if", "that"],
-                        vav.pos in ["TO"]]):
+                if (next_vocab.is_coordinating_conjunction() or
+                    next_vocab.is_existential_there() or
+                    next_vocab.is_verb() or
+                    next_vocab.word in ["if", "that"] or
+                        next_vocab.pos in ["TO"]):
                     break
 
                 # go to next if it is not preposition
-                if not vav.is_preposition():
+                if not next_vocab.is_preposition():
                     continue
 
-                phrasal_verb, origin = VocabularyService.__create_phrases_with_origin([vocab, vav])
-                phrase = Phrase(id=id_, phrase=phrasal_verb,
-                                original_form=origin,
-                                subtitle_id=vocab.subject_id)
+                phrasal_verb, origin = VocabularyService.__create_phrases_with_origin([vocab, next_vocab])
+                phrases.append(Phrase(id=id_, phrase=phrasal_verb,
+                                      original_form=origin,
+                                      subtitle_id=vocab.subtitle_id))
                 id_ += 1
-                phrases.append(phrase)
 
-                # after find a preposition, no need to find the second preposition
-                # e.g. go with: You're going out with a guy
+                # Stop after finding the first preposition. (e.g. go with: You're going out with a guy)
                 break
+        print(len(phrases))
         return phrases
 
     def retrieve_group_preposition(self, vocabs: list[Vocabulary, ]) -> list[Phrase, ]:
@@ -304,7 +303,7 @@ class VocabularyService(object):
         for vocab in vocabs:
             is_modelize = False
             # get next vocab
-            subtitle_vocabs = [v for v in vocabs if v.subject_id == vocab.subject_id]
+            subtitle_vocabs = [v for v in vocabs if v.subtitle_id == vocab.subtitle_id]
             idx = VocabularyService.__get_index_number(subtitle_vocabs, vocab)
             if idx is None:
                 continue
@@ -313,7 +312,7 @@ class VocabularyService(object):
             if next_vocab is None:
                 continue
             # if the next vocab comes from different subtitle, it is not group preposition
-            if not vocab.subject_id == next_vocab.subject_id:
+            if not vocab.subtitle_id == next_vocab.subtitle_id:
                 continue
 
             # case A
@@ -322,7 +321,7 @@ class VocabularyService(object):
                     vocab.is_conjunction(),
                     vocab.pos in ["VBG"]]):
                 # exceptional case
-                if vocab.english in ["going"]:
+                if vocab.word in ["going"]:
                     continue
 
                 if next_vocab.is_preposition():
@@ -335,7 +334,7 @@ class VocabularyService(object):
             if second_vocab is None:
                 continue
             # if the next vocab comes from different subtitle, it is not group preposition
-            if not vocab.subject_id == second_vocab.subject_id:
+            if not vocab.subtitle_id == second_vocab.subtitle_id:
                 continue
 
             # case B
@@ -366,7 +365,7 @@ class VocabularyService(object):
             if is_modelize:
                 phrase = Phrase(id=id_, phrase=group_preposition,
                                 original_form=origin,
-                                subtitle_id=vocab.subject_id)
+                                subtitle_id=vocab.subtitle_id)
                 id_ += 1
                 phrases.append(phrase)
 
@@ -425,7 +424,7 @@ class VocabularyService(object):
         else:
             idx = 1
 
-        vocabs_list = [vocab.english for vocab in vocabs]
+        vocabs_list = [vocab.word for vocab in vocabs]
         phrase = " ".join(vocabs_list)
 
         origin = VocabularyService.__lemmatize(vocabs[idx])
@@ -453,7 +452,7 @@ class VocabularyService(object):
                 "Chrome/78.0.3904.97 Safari/537.36"
             )
         }
-        word = vocab.original if vocab.original else vocab.english
+        word = vocab.original_form if vocab.original_form else vocab.word
         url = f'https://ejje.weblio.jp/content/{word}'
 
         html = requests.get(url, headers=headers, timeout=5)
