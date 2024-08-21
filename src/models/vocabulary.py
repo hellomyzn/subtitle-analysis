@@ -22,8 +22,13 @@ class Vocabulary(Model):
     """vocabulary data class"""
     id: int | None = field(init=True, default=None)
     english: str | None = field(init=True, default=None)
+    meaning: str | None = field(init=True, default=None)
     pos: str | None = field(init=True, default=None)
     original: str | None = field(init=True, default=None)
+    level: str | None = field(init=True, default=None)
+    eiken_level: str | None = field(init=True, default=None)
+    school_level: str | None = field(init=True, default=None)
+    toeic_level: str | None = field(init=True, default=None)
     subject_id: str | None = field(init=True, default=None)
 
     @classmethod
@@ -39,8 +44,13 @@ class Vocabulary(Model):
         return cls(**{
             "id": dict_.get("id"),
             "english": dict_.get("english"),
+            "meaning": dict_.get("meaning"),
             "pos": dict_.get("pos"),
             "original": dict_.get("original"),
+            "level": dict_.get("level"),
+            "eiken_level": dict_.get("eiken_level"),
+            "school_level": dict_.get("school_level"),
+            "toeic_level": dict_.get("toeic_level"),
             "subject_id": dict_.get("subject_id")
         })
 
@@ -56,8 +66,13 @@ class Vocabulary(Model):
         dict_ = {
             "id": self.id,
             "english": self.english,
+            "meaning": self.meaning,
             "pos": self.pos,
             "original": self.original,
+            "level": self.level,
+            "eiken_level": self.eiken_level,
+            "school_level": self.school_level,
+            "toeic_level": self.toeic_level,
             "subject_id": self.subject_id
         }
 
@@ -74,14 +89,35 @@ class Vocabulary(Model):
         """
         return json.dumps(self.to_dict(), ensure_ascii=False)
 
-    def get_subtitle(self) -> Subtitle:
-        """_summary_
+    def fetch_subtitle(self) -> Subtitle:
+        """
+        Retrieves the subtitle associated with the object's subject ID.
 
         Returns:
-            Subtitle: _description_
+            Subtitle: The subtitle corresponding to the object's subject ID, retrieved from the CSV subtitle repository.
         """
         csv_subtitle = CsvSubtitleRepository()
         return csv_subtitle.find_by_id(self.subject_id)
+
+    def find_by_attr(self, vocabs: list["Vocabulary", ], attr: str):
+        """
+        Searches for an object in the list with the same attribute value as the calling object.
+
+        Args:
+            vocabs (list["Vocabulary"]): A list of Vocabulary objects to search through.
+            attr (str): The attribute name to compare between the calling object and the list elements.
+
+        Returns:
+            Vocabulary or None: The first Vocabulary object from the list that has the same value
+            for the specified attribute as the calling object. Returns None if no match is found.
+        """
+
+        value_to_find = getattr(self, attr)
+
+        for vocab in vocabs:
+            if getattr(vocab, attr) == value_to_find:
+                return vocab
+        return None
 
     def is_coordinating_conjunction(self) -> bool:
         """check coordinating conjunction

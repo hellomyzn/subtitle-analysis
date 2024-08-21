@@ -2,11 +2,13 @@
 #########################################################
 # Builtin packages
 #########################################################
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+import requests
 
 #########################################################
 # 3rd party packages
 #########################################################
+import bs4
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 
@@ -33,46 +35,76 @@ class VocabularyService(object):
 
     @ exception_module
     def add(self, vocabs: list[Vocabulary, ]):
+        """
+        Adds a list of Vocabulary objects by writing them to both a CSV file and Google Sheets.
+
+        Args:
+            vocabs (list[Vocabulary]): The list of Vocabulary objects to be added.
+        """
         self.write_csv(vocabs)
         self.write_gss(vocabs)
 
     @ exception_module
     def extract_from_subtitles(self, subs: list[Subtitle, ]):
-        """extract vocabulary from sentence using nltk package
+        """
+        Extracts vocabulary from subtitles using the NLTK package.
 
         Args:
-            subs (list): english subtitles
+            subs (list[Subtitle]): A list of English subtitles.
 
         Returns:
-            list[Vocabulary,]: vocabularies splitted by nltk
+            list[Vocabulary]: A list of Vocabulary objects created from the subtitles.
         """
-        # download necessary sources
+        # Download necessary NLTK resources
         nltk.download('punkt')
         nltk.download('averaged_perceptron_tagger')
         nltk.download('wordnet')
 
         vocabularies = []
-        vocs_to_exclude = [".", ",", ":", "``", "''", "?", "!", "...", "[", "]"]
+        vocs_to_exclude = [".", ",", ":", "``", "''", "?", "!", "...", "[", "]", "&"]
         id_ = 1
 
         for sub in subs:
-            # separate sentence by word
-            morph = nltk.word_tokenize(sub.sentence)
-            # analyze part of speech by word
-            voc_pos_list = nltk.pos_tag(morph)
-            for voc, pos in voc_pos_list:
-                voc = voc.lower()
+            # Tokenize the sentence into words
+            words = nltk.word_tokenize(sub.sentence)
+            # Tag each word with its part of speech
+            tagged_words = nltk.pos_tag(words)
 
-                # if vocabulary is not word
-                if voc in vocs_to_exclude:
+            for word, pos in tagged_words:
+                word = word.lower()
+
+                # Skip excluded vocabulary
+                if word in vocs_to_exclude:
                     continue
 
-                vocabulary = Vocabulary(id=id_, english=voc, pos=pos,
-                                        original=None, subject_id=sub.id)
-                # get original form
-                # e.g. studied -> study
+                vocabulary = Vocabulary(
+                    id=id_,
+                    english=word,
+                    meaning=None,
+                    pos=pos,
+                    original=None,
+                    level=None,
+                    eiken_level=None,
+                    school_level=None,
+                    toeic_level=None,
+                    subject_id=sub.id)
+
+                # Lemmatize to get the original form (e.g., studied -> study)
                 origin = VocabularyService.__lemmatize(vocabulary)
                 vocabulary.original = origin
+
+                # Avoid scraping the same vocabulary by checking if it already exists
+                existing_vocab = vocabulary.find_by_attr(vocabularies, "english")
+
+                if existing_vocab:
+                    vocabulary.level = existing_vocab.level
+                    vocabulary.eiken_level = existing_vocab.eiken_level
+                    vocabulary.school_level = existing_vocab.school_level
+                    vocabulary.toeic_level = existing_vocab.toeic_level
+                    vocabulary.meaning = existing_vocab.meaning
+                else:
+                    vocabulary.level, vocabulary.eiken_level, vocabulary.school_level, vocabulary.toeic_level, vocabulary.meaning = self.__scrap_vocabulary(
+                        vocabulary)
 
                 vocabularies.append(vocabulary)
                 id_ += 1
@@ -80,38 +112,48 @@ class VocabularyService(object):
 
     @classmethod
     def __lemmatize(cls, vocab: Vocabulary) -> str:
-        """get original form of vocabulary
-            e.g. studied -> study
-            it works to only verb, adjective, adverb, noun.
+        """
+        Get the original form (lemma) of the vocabulary.
+        For example, 'studied' -> 'study'.
+        This works only for verbs, adjectives, adverbs, and nouns.
 
         Args:
-            vocab (Vocabulary): vocabulary
+            vocab (Vocabulary): The vocabulary object containing the word to lemmatize.
 
         Returns:
-            str: original form of vocabulary
+            str: The original (lemmatized) form of the vocabulary, or the word itself if no lemmatization is possible.
         """
         lem = WordNetLemmatizer()
         word = vocab.english
-        origin = None
-        mode = None
+        pos_map = {
+            "v": vocab.is_verb,
+            "a": vocab.is_adjective,
+            "r": vocab.is_adverb,
+            "n": vocab.is_noun
+        }
 
-        if vocab.is_verb():
-            mode = "v"
-        if vocab.is_adjective():
-            mode = "a"
-        if vocab.is_adverb():
-            mode = "r"
-        if vocab.is_noun():
-            mode = "n"
+        for mode, check_func in pos_map.items():
+            if check_func():
+                return lem.lemmatize(word, mode)
 
-        if mode:
-            origin = lem.lemmatize(word, mode)
-        return origin
+        return word
 
     @ exception_module
     def write_csv(self, vocabs: list[Vocabulary, ], output_path: str | None = None) -> None:
+        """
+        Writes a list of Vocabulary objects to a CSV file.
+        If an output path is provided, the CSV will be saved to that location with a modified filename.
+
+        Args:
+            vocabs (list[Vocabulary]): The list of Vocabulary objects to write to the CSV file.
+            output_path (str | None): Optional; If provided, this path will be used for the output CSV file.
+
+        Returns:
+            None
+        """
+        path = self.csv_repo.path
+
         if output_path:
-            path = self.csv_repo.path
             dir_path = "/".join(path.split("/")[:-1])
             filename = f"{output_path}_{path.split('/')[-1]}"
             output_path = f"{dir_path}/{filename}"
@@ -123,10 +165,28 @@ class VocabularyService(object):
 
     @ exception_module
     def write_gss(self, vocabs: list[Vocabulary, ]) -> None:
+        """
+        Writes a list of Vocabulary objects to Google Sheets.
+
+        Args:
+            vocabs (list[Vocabulary]): The list of Vocabulary objects to add to Google Sheets.
+
+        Returns:
+            None
+        """
         self.gss_repo.add(vocabs)
 
     @ exception_module
     def sort_by_pos(self, vocabs: list[Vocabulary, ]) -> PartOfSpeech:
+        """
+        Sorts a list of Vocabulary objects by their part of speech and groups them into a PartOfSpeech object.
+
+        Args:
+            vocabs (list[Vocabulary]): The list of Vocabulary objects to sort.
+
+        Returns:
+            PartOfSpeech: An object containing the grouped Vocabulary objects by their part of speech.
+        """
         pos = PartOfSpeech()
         for vocab in vocabs:
             pos.append_values(vocab.pos, vocab)
@@ -134,42 +194,45 @@ class VocabularyService(object):
 
     @ exception_module
     def add_by_pos(self, part_of_speech: PartOfSpeech) -> None:
-        poss = part_of_speech.attributes
-        for pos in poss:
+        """
+        Adds Vocabulary objects grouped by their part of speech to CSV files.
+
+        Args:
+            part_of_speech (PartOfSpeech): An object containing Vocabulary objects grouped by part of speech.
+
+        Returns:
+            None
+        """
+        for pos in part_of_speech.attributes:
             vocabs = part_of_speech.get_values(pos)
             output_path = f"/pos/{pos}"
             self.write_csv(vocabs, output_path=output_path)
 
     @exception_module
     def retrieve_phrasal_verbs(self, vocabs: list[Vocabulary, ]) -> list[Phrase, ]:
-        """retrieve phrasal verbs
+        """
+        Retrieve phrasal verbs from a list of Vocabulary objects.
 
-            exclude conjunction after verb
-                e.g. know in: you probably didn't know this but back in high school I had a major crush on you.
-            exclude existential there after verb
-                e.g. That's like saying there is only one flavor of ice cream.
-            exclude verb after verb
-                e.g. That's like saying there is only one flavor of ice cream.
-            exclude IN of that, if after verb
-                e.g. You still think you might want that(IN) fifth date
-            exclude to(TO)
-                e.g. I went to your building.
-            exclude IN of if after verb
-                e.g. I mean what if(IN) you get one woman and that's it.
+        Exclusion criteria:
+        - Exclude conjunctions after the verb (e.g., "know" in: "You probably didn't know this but back in high school I had a major crush on you.")
+        - Exclude existential "there" after the verb (e.g., "That's like saying there is only one flavor of ice cream.")
+        - Exclude verbs after the verb (e.g., "That's like saying there is only one flavor of ice cream.")
+        - Exclude "IN" of "that" or "if" after the verb (e.g., "You still think you might want that fifth date.")
+        - Exclude "to" (TO) (e.g., "I went to your building.")
+        - Exclude "IN" of "if" after the verb (e.g., "I mean what if you get one woman and that's it.")
 
         Args:
-            vocabs (list[Vocabulary, ]): _description_
+            vocabs (list[Vocabulary]): List of Vocabulary objects to analyze.
 
         Returns:
-            phrases (list[Phrase, ]): _description_
+            list[Phrase]: A list of Phrase objects representing the identified phrasal verbs.
         """
         phrases = []
         id_ = 1
         verbs_to_exclude = ["be", "'m", "'re", "'ve", "am", "are", "is", "'s", "do"]
         for vocab in vocabs:
             # exclude aside from verbs and specific verbs
-            if any([not vocab.is_verb(),
-                    vocab.original in verbs_to_exclude]):
+            if not vocab.is_verb() or vocab.original in verbs_to_exclude:
                 continue
 
             # get vocabs after the verb in the same subtitle
@@ -178,7 +241,7 @@ class VocabularyService(object):
             vocabularies_after_verb = subtitle_vocabs[idx + 1:]
 
             # no need to analyze if there is no vocab after the verb
-            if vocabularies_after_verb == []:
+            if not vocabularies_after_verb:
                 continue
 
             for vav in vocabularies_after_verb:
@@ -370,3 +433,54 @@ class VocabularyService(object):
             vocabs_list[idx] = origin
             origin = " ".join(vocabs_list)
         return phrase, origin
+
+    @staticmethod
+    def __scrap_vocabulary(vocab: Vocabulary) -> tuple[str | None, str | None, str | None, str | None, str | None]:
+        """
+        Scrapes Weblio to retrieve vocabulary levels and meaning.
+
+        Args:
+            vocab (Vocabulary): The vocabulary object containing the word to scrape.
+
+        Returns:
+            tuple[str | None, str | None, str | None, str | None, str | None]:
+            A tuple containing level, Eiken level, school level, TOEIC level, and meaning.
+        """
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/78.0.3904.97 Safari/537.36"
+            )
+        }
+        word = vocab.original if vocab.original else vocab.english
+        url = f'https://ejje.weblio.jp/content/{word}'
+
+        html = requests.get(url, headers=headers, timeout=5)
+        soup = bs4.BeautifulSoup(html.content, "html.parser")
+        # Level keys
+        level_keys = {
+            "レベル": None,
+            "英検": None,
+            "学校レベル": None,
+            "TOEIC® L&Rスコア": None
+        }
+
+        # Extract levels
+        labels = soup.select(".learning-level-label")
+        contents = soup.select(".learning-level-content")
+        for label, content in zip(labels, contents):
+            label_text = label.text.strip()
+            if label_text in level_keys:
+                level_keys[label_text] = content.text.strip()
+
+        level = level_keys["レベル"]
+        eiken = level_keys["英検"]
+        school = level_keys["学校レベル"]
+        toeic = level_keys["TOEIC® L&Rスコア"]
+
+        # Extract meaning
+        meaning_element = soup.select_one(".content-explanation")
+        meaning = meaning_element.text.strip() if meaning_element else None
+
+        return level, eiken, school, toeic, meaning
