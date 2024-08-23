@@ -57,12 +57,14 @@ class PartOfSpeech(Model):
     WP_DOLLAR: list = field(init=True, default_factory=list)
     WRB: list = field(init=True, default_factory=list)
     _DOLLAR: list = field(init=True, default_factory=list)
+    VPV: list = field(init=True, default_factory=list)
+    GP: list = field(init=True, default_factory=list)
 
     attributes = ["CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS",
                   "LS", "MD", "NN", "NNS", "NNP", "NNPS", "PDT", "POS",
                   "PRP", "PRP$", "RB", "RBR", "RBS", "RP", "SYM", "TO",
                   "UH", "VB", "VBD", "VBG", "VBN", "VBP", "VBZ", "WDT",
-                  "WP", "WP$", "WRB", "$"]
+                  "WP", "WP$", "WRB", "$", "VPV", "GP"]
 
     verbs_keys = ["VB", "VBD", "VBG", "VBN", "VBP", "VBZ"]
     adjectives_keys = ["JJ", "JJR", "JJS"]
@@ -116,7 +118,9 @@ class PartOfSpeech(Model):
             "WP": dict_.get("WP"),
             "WP_DOLLAR": dict_.get("WP$"),
             "WRB": dict_.get("WRB"),
-            "_DOLLAR": dict_.get("$")})
+            "_DOLLAR": dict_.get("$"),
+            "VPV": dict_.get("VPV"),
+            "GP": dict_.get("GP")})
 
     def to_dict(self, without_none_field: bool = False) -> dict:
         """convert from model to dict
@@ -164,7 +168,9 @@ class PartOfSpeech(Model):
             "WP": self.WP,
             "WP$": self.WP_DOLLAR,
             "WRB": self.WRB,
-            "$": self._DOLLAR}
+            "$": self._DOLLAR,
+            "VPV": self.VPV,
+            "GP": self.GP}
 
         if without_none_field:
             return {key: value for key, value in dict_.items() if value is not None}

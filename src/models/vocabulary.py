@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 # Own packages
 #########################################################
 from models import Model, Subtitle
-from repositories.subtitles import CsvSubtitleRepository
 
 
 @dataclass
@@ -96,9 +95,15 @@ class Vocabulary(Model):
         Returns:
             Subtitle: The subtitle corresponding to the object's subtitle ID, retrieved from the CSV subtitle repository.
         """
+        from repositories.subtitles import CsvSubtitleRepository
         csv_subtitle = CsvSubtitleRepository()
         return csv_subtitle.find_by_id(self.subtitle_id)
 
+    def is_same_value(self, vocab: "Vocabulary", attr: str) -> bool:
+        # TODO: tyr catch of ValueError
+        return getattr(self, attr) == getattr(vocab, attr)
+
+    # TODO: change name to fine same value
     def find_by_attr(self, vocabs: list["Vocabulary", ], attr: str):
         """
         Searches for an object in the list with the same attribute value as the calling object.

@@ -6,5 +6,7 @@ from .constant import (
     SUBS_PATH,
     SUBS_CSV_PATH,
     VOCABULARY_PATH,
+    PHRASAL_VERB_PATH,
+    GROUP_PREPOSITION_PATH,
     FREQUENCY_PATH
 )

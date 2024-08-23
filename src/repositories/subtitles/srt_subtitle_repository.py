@@ -55,6 +55,8 @@ class SrtSubtitleRepository(object):
         """
         sentences = []
         id_ = 1
+        time_from = None
+        time_to = None
         for line in lines:
             if self.__is_time_range(line):
                 time_from, time_to = self.__retrieve_time_range(line)

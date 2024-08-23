@@ -12,12 +12,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 #########################################################
 # Own packages
 #########################################################
-from utils import Singleton
 from common.config import Config
 from common.log import (
     info,
     error_stack_trace
 )
+from utils import Singleton
 
 
 class GssAccessor(Singleton):

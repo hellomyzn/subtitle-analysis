@@ -9,6 +9,7 @@ from dataclasses import dataclass
 # 3rd party packages
 #########################################################
 import gspread
+from google.auth.exceptions import TransportError
 
 #########################################################
 # Own packages
@@ -26,6 +27,7 @@ from repositories import BaseRepositoryInterface
 
 CONFIG = Config().config
 SHEET_KEY = CONFIG["GSS"]["SHEET_KEY"]
+IS_OFFLINE = CONFIG["APP"]["OFFLINE"]
 
 
 @dataclass
@@ -36,12 +38,15 @@ class GssBaseRepository(BaseRepositoryInterface):
         self.sheet_name = sheet_name
         self.columns = columns
         self.adapter = adapter
-        gss = GssAccessor()
-        workbook = gss.connection.open_by_key(SHEET_KEY)
-        self.worksheet = workbook.worksheet(sheet_name)
+        self.is_offline = False
 
-        if not self.__has_columns():
-            self.__write_columns()
+        if not IS_OFFLINE:
+            gss = GssAccessor()
+            workbook = gss.connection.open_by_key(SHEET_KEY)
+            self.worksheet = workbook.worksheet(sheet_name)
+
+            if not self.__has_columns():
+                self.__write_columns()
 
     def all(self) -> list:
         pass
@@ -61,6 +66,10 @@ class GssBaseRepository(BaseRepositoryInterface):
             MyGssResourceExhaustedException: _description_
             MyGssException: _description_
         """
+        if IS_OFFLINE:
+            warn("adding function doesn't work since it's offline mode")
+            return
+
         inputs = []
 
         for model in data:

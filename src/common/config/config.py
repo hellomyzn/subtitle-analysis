@@ -12,10 +12,10 @@ from configparser import ConfigParser
 #########################################################
 # Own packages
 #########################################################
-from utils import Singleton
+# (None)
 
 
-class Config(Singleton):
+class Config():
     """
     Usage:
         1. $ cp common/config/config.ini.template common/config/config.ini

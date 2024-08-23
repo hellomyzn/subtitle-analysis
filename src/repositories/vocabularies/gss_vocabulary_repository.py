@@ -20,8 +20,6 @@ from repositories import ModelAdapter
 class GssVocabularyRepository(GssBaseRepository):
     """gss vocabulary repository"""
 
-    SHEET_NAME = "vocabulary"
-
     KEY_ID = "id"
     KEY_WORD = "word"
     KEY_MEANING = "meaning"
@@ -35,7 +33,7 @@ class GssVocabularyRepository(GssBaseRepository):
     COLUMNS = [KEY_ID, KEY_WORD, KEY_MEANING, KEY_POS, KEY_ORIGINAL_FORM, KEY_LEVEL,
                KEY_EIKEN_LEVEL, KEY_SCHOOL_LEVEL, KEY_TOEIC_LEVEL, KEY_SUBTITLE_ID]
 
-    def __init__(self):
+    def __init__(self, sheet_name: str = "vocabulary"):
         adapter: ModelAdapter = ModelAdapter(Vocabulary, {
             "id": self.KEY_ID,
             "word": self.KEY_WORD,
@@ -47,4 +45,4 @@ class GssVocabularyRepository(GssBaseRepository):
             "school_level": self.KEY_SCHOOL_LEVEL,
             "toeic_level": self.KEY_TOEIC_LEVEL,
             "subtitle_id": self.KEY_SUBTITLE_ID})
-        super().__init__(self.SHEET_NAME, self.COLUMNS, adapter)
+        super().__init__(sheet_name, self.COLUMNS, adapter)
