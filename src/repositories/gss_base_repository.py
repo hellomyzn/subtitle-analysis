@@ -55,6 +55,8 @@ class GssBaseRepository(BaseRepositoryInterface):
         except gspread.exceptions.WorksheetNotFound as exp:
             warn("sheet doens't exist.: {0}", sheet_name)
             raise exp
+        if not self.__has_columns():
+            self.__write_columns()
 
     def all(self) -> list:
         pass

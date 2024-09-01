@@ -79,14 +79,19 @@ class FrequencyService(object):
     @ exception_module
     def calculate_vocab_frequencies(self, vocabs: list[Vocabulary,]) -> list[Frequency, ]:
         info("calculate vocabulary frequencies")
-        vocabs = [vocab.original_form for vocab in vocabs]
-        vocab_freqs = dict(Counter(vocabs).most_common())
+        vocabs_original_form = [vocab.original_form for vocab in vocabs]
+        vocab_freqs = dict(Counter(vocabs_original_form).most_common())
 
         freqs = []
         id_ = 1
         for vocab, times in vocab_freqs.items():
+            vocab_obj = next(v for v in vocabs if v.original_form == vocab)
             freq = Frequency(id=id_,
                              vocabulary=vocab,
+                             level=vocab_obj.level,
+                             eiken_level=vocab_obj.eiken_level,
+                             school_level=vocab_obj.school_level,
+                             toeic_level=vocab_obj.toeic_level,
                              times=times)
             freqs.append(freq)
             id_ += 1

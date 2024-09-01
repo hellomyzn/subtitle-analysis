@@ -22,6 +22,10 @@ class Frequency(Model):
     id: int | None = field(init=True, default=None)
     vocabulary: str | None = field(init=True, default=None)
     times: int | None = field(init=True, default=None)
+    level: str | None = field(init=True, default=None)
+    eiken_level: str | None = field(init=True, default=None)
+    school_level: str | None = field(init=True, default=None)
+    toeic_level: str | None = field(init=True, default=None)
 
     @classmethod
     def from_dict(cls, dict_: dict):
@@ -36,7 +40,12 @@ class Frequency(Model):
         return cls(**{
             "id": dict_.get("id"),
             "vocabulary": dict_.get("vocabulary"),
-            "times": dict_.get("times")})
+            "times": dict_.get("times"),
+            "level": dict_.get("level"),
+            "eiken_level": dict_.get("eiken_level"),
+            "school_level": dict_.get("school_level"),
+            "toeic_level": dict_.get("toeic_level")
+        })
 
     def to_dict(self, without_none_field: bool = False) -> dict:
         """convert from model to dict
@@ -50,7 +59,12 @@ class Frequency(Model):
         dict_ = {
             "id": self.id,
             "vocabulary": self.vocabulary,
-            "times": self.times}
+            "times": self.times,
+            "level": self.level,
+            "eiken_level": self.eiken_level,
+            "school_level": self.school_level,
+            "toeic_level": self.toeic_level
+        }
 
         if without_none_field:
             return {key: value for key, value in dict_.items() if value is not None}

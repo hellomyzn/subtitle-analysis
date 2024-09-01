@@ -25,11 +25,20 @@ class CsvFrequencyRepository(CsvBaseRepository):
     KEY_ID = "id"
     KEY_VOCABULARY = "vocabulary"
     KEY_TIME = "times"
-    HEADER = [KEY_ID, KEY_VOCABULARY, KEY_TIME]
+    KEY_LEVEL = "level"
+    KEY_EIKEN_LEVEL = "eiken_level"
+    KEY_SCHOOL_LEVEL = "school_level"
+    KEY_TOEIC_LEVEL = "toeic_level"
+    HEADER = [KEY_ID, KEY_VOCABULARY, KEY_TIME, KEY_LEVEL,
+              KEY_EIKEN_LEVEL, KEY_SCHOOL_LEVEL, KEY_TOEIC_LEVEL]
     adapter: ModelAdapter = ModelAdapter(Frequency, {
         "id": KEY_ID,
         "vocabulary": KEY_VOCABULARY,
-        "times": KEY_TIME})
+        "times": KEY_TIME,
+        "level": KEY_LEVEL,
+        "eiken_level": KEY_EIKEN_LEVEL,
+        "school_level": KEY_SCHOOL_LEVEL,
+        "toeic_level": KEY_TOEIC_LEVEL})
 
     def __init__(self):
         file_name = TARGET_PATH.replace("/", "_")
