@@ -103,6 +103,7 @@ class VocabularyService(object):
                 else:
                     vocabulary.level, vocabulary.eiken_level, vocabulary.school_level, vocabulary.toeic_level, vocabulary.meaning = scrap_vocabulary(
                         vocabulary)
+                info(vocabulary)
 
                 vocabularies.append(vocabulary)
                 id_ += 1

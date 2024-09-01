@@ -7,7 +7,7 @@
 # 3rd party packages
 #########################################################
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 #########################################################
 # Own packages
@@ -43,7 +43,8 @@ class GssAccessor(Singleton):
     __connection = None
 
     def __init__(self):
-        self.__connection = self.__initialize()
+        if not self.__connection:
+            self.__connection = self.__initialize()
 
     @property
     def connection(self) -> gspread.client.Client:
@@ -60,24 +61,26 @@ class GssAccessor(Singleton):
         Returns:
             connection: connection for google_spreadsheet
         """
-        if self.__connection is not None:
-            return self.__connection
-
         connection = None
         config = Config().config
         json_path = config['GSS']['JSON_PATH']
-        scope = ['https://spreadsheets.google.com/feeds',
-                 'https://www.googleapis.com/auth/drive']
+        scopes = [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive'
+        ]
 
         info('Start connecting Google Spreadsheet')
 
         try:
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(json_path, scope)
+            credentials = Credentials.from_service_account_file(json_path, scopes=scopes)
             connection = gspread.authorize(credentials)
             info('Succeed in connecting Google Spreadsheet')
-
+        except FileNotFoundError as fnf_error:
+            error_stack_trace(f"JSON file not found: {fnf_error}. Path: {json_path}")
+        except gspread.exceptions.APIError as api_error:
+            error_stack_trace(f"Google API error: {api_error}")
         except Exception as err:
             error_stack_trace(
-                f"Fail to connect Google Spreadsheet. error: {err}, json_path: {json_path}, scope: {scope}")
+                f"Fail to connect Google Spreadsheet. error: {err}, json_path: {json_path}, scope: {scopes}")
 
         return connection

@@ -9,7 +9,8 @@ from dataclasses import dataclass
 # 3rd party packages
 #########################################################
 import gspread
-from google.auth.exceptions import TransportError
+from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
 
 #########################################################
 # Own packages
@@ -19,7 +20,7 @@ from common.decorator import gss_module
 from common.exceptions import (MyGssException,
                                MyGssInvalidArgumentException,
                                MyGssResourceExhaustedException)
-from common.google_spreadsheet import GssAccessor
+from common.google_spreadsheet import GssAccessor, GDriveAccessor
 from common.log import warn, info, debug
 from models import Model
 from repositories import BaseRepositoryInterface
@@ -38,15 +39,21 @@ class GssBaseRepository(BaseRepositoryInterface):
         self.sheet_name = sheet_name
         self.columns = columns
         self.adapter = adapter
-        self.is_offline = False
+        self.workbook = None
+        self.worksheet = None
 
         if not IS_OFFLINE:
-            gss = GssAccessor()
-            workbook = gss.connection.open_by_key(SHEET_KEY)
-            self.worksheet = workbook.worksheet(sheet_name)
+            self.gss = GssAccessor()
+            self.update_sheet_name(sheet_name)
+            # self.gda = GDriveAccessor()
 
             if not self.__has_columns():
                 self.__write_columns()
+
+    @gss_module
+    def update_sheet_name(self, sheet_name: str):
+        self.workbook = self.gss.connection.open_by_key(SHEET_KEY)
+        self.worksheet = self.workbook.worksheet(sheet_name)
 
     def all(self) -> list:
         pass

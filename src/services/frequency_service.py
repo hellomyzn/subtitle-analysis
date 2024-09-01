@@ -45,6 +45,8 @@ class FrequencyService(object):
             self.csv_repo.path = self.__create_csv_path(csv_filename)
         if gss_sheet_name:
             self.gss_repo.sheet_name = gss_sheet_name
+            self.gss_repo.update_sheet_name(gss_sheet_name)
+
         self.write_csv(freqs)
         self.write_gss(freqs)
 

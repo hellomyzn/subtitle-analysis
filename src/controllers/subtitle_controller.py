@@ -57,20 +57,20 @@ class SubtitleController(object):
 
         verbs = [v for v in vocabs if v.is_verb()]
         verbs_freq = self.freq_serv.calculate_vocab_frequencies(verbs)
-        self.freq_serv.add(freqs=verbs_freq, csv_filename="verbs")
+        self.freq_serv.add(freqs=verbs_freq, csv_filename="verbs", gss_sheet_name="freq_verbs")
 
         adverbs = [v for v in vocabs if v.is_adverb()]
         adverbs_freq = self.freq_serv.calculate_vocab_frequencies(adverbs)
-        self.freq_serv.add(freqs=adverbs_freq, csv_filename="adverbs")
+        self.freq_serv.add(freqs=adverbs_freq, csv_filename="adverbs", gss_sheet_name="freq_adverbs")
 
         adjectives = [v for v in vocabs if v.is_adjective()]
         adjectives_freq = self.freq_serv.calculate_vocab_frequencies(adjectives)
-        self.freq_serv.add(freqs=adjectives_freq, csv_filename="adjectives")
+        self.freq_serv.add(freqs=adjectives_freq, csv_filename="adjectives", gss_sheet_name="freq_adjectives")
 
         nouns = [v for v in vocabs if v.is_noun()]
         noun_freq = self.freq_serv.calculate_vocab_frequencies(nouns)
-        self.freq_serv.add(freqs=noun_freq, csv_filename="nouns")
+        self.freq_serv.add(freqs=noun_freq, csv_filename="nouns", gss_sheet_name="freq_nouns")
 
         all_vocabs = verbs + adverbs + adjectives + nouns
         all_freqs = self.freq_serv.calculate_vocab_frequencies(all_vocabs)
-        self.freq_serv.add(all_freqs, csv_filename="result")
+        self.freq_serv.add(all_freqs, csv_filename="result", gss_sheet_name="result")
