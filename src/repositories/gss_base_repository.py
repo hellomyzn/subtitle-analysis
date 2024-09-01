@@ -9,8 +9,6 @@ from dataclasses import dataclass
 # 3rd party packages
 #########################################################
 import gspread
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 
 #########################################################
 # Own packages
@@ -20,7 +18,7 @@ from common.decorator import gss_module
 from common.exceptions import (MyGssException,
                                MyGssInvalidArgumentException,
                                MyGssResourceExhaustedException)
-from common.google_spreadsheet import GssAccessor, GDriveAccessor
+from common.google_spreadsheet import GssAccessor
 from common.log import warn, info, debug
 from models import Model
 from repositories import BaseRepositoryInterface
@@ -39,7 +37,6 @@ class GssBaseRepository(BaseRepositoryInterface):
         self.sheet_name = sheet_name
         self.columns = columns
         self.adapter = adapter
-        self.workbook = None
         self.worksheet = None
 
         if not IS_OFFLINE:
@@ -52,8 +49,12 @@ class GssBaseRepository(BaseRepositoryInterface):
 
     @gss_module
     def update_sheet_name(self, sheet_name: str):
-        self.workbook = self.gss.connection.open_by_key(SHEET_KEY)
-        self.worksheet = self.workbook.worksheet(sheet_name)
+        workbook = self.gss.connection.open_by_key(SHEET_KEY)
+        try:
+            self.worksheet = workbook.worksheet(sheet_name)
+        except gspread.exceptions.WorksheetNotFound as exp:
+            warn("sheet doens't exist.: {0}", sheet_name)
+            raise exp
 
     def all(self) -> list:
         pass

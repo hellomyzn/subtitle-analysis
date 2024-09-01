@@ -71,6 +71,12 @@ class SubtitleController(object):
         noun_freq = self.freq_serv.calculate_vocab_frequencies(nouns)
         self.freq_serv.add(freqs=noun_freq, csv_filename="nouns", gss_sheet_name="freq_nouns")
 
+        noun_freq = self.freq_serv.calculate_vocab_frequencies(pos_vocabs.VPV)
+        self.freq_serv.add(freqs=noun_freq, csv_filename="phrasal_verb", gss_sheet_name="freq_phrasal_verb")
+
+        noun_freq = self.freq_serv.calculate_vocab_frequencies(pos_vocabs.GP)
+        self.freq_serv.add(freqs=noun_freq, csv_filename="group_preposition", gss_sheet_name="freq_group_preposition")
+
         all_vocabs = verbs + adverbs + adjectives + nouns
         all_freqs = self.freq_serv.calculate_vocab_frequencies(all_vocabs)
         self.freq_serv.add(all_freqs, csv_filename="result", gss_sheet_name="result")

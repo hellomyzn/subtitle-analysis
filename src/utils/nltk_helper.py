@@ -21,6 +21,7 @@ def word_tokenize(sentence) -> list:
         return nltk.word_tokenize(sentence)
     except LookupError:
         nltk.download('punkt')
+        nltk.download('punkt_tab')
         return nltk.word_tokenize(sentence)
 
 
@@ -29,6 +30,8 @@ def pos_tag(words: list) -> list:
         return nltk.pos_tag(words)
     except LookupError:
         nltk.download('averaged_perceptron_tagger')
+        nltk.download('averaged_perceptron_tagger_eng')
+
         return nltk.pos_tag(words)
 
 
