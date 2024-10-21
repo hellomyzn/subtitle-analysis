@@ -1,0 +1,68 @@
+@startuml subtitle
+title subtitle
+
+' フッターを隠せる
+hide footbox
+Participant main
+Participant controller
+Participant service
+
+box repository
+Participant srt
+Participant csv
+Participant gss
+' subtitle file
+end box
+
+activate main
+
+
+== 1. subtitleを取得 ==
+activate controller
+main -> controller:
+deactivate main
+
+activate service
+controller -> service:
+
+' extract subtitle lines
+activate srt
+service -> srt: get subtitle data
+note over srt: extract only subtitle lines
+srt -> service: subtitle lines
+note over service: subtitles = 抽出したsubtitles
+deactivate srt
+service -> controller: $subtitles
+
+== 2. 取得したsubtitleをrepoに追加する ==
+activate csv
+service -> csv: add lines to csv
+csv -> service:
+deactivate csv
+
+activate gss
+service -> gss: add lines to gss
+gss -> service:
+deactivate gss
+
+
+== 3. subtitleからvacabularyを取得する ==
+note over service
+    nltkを使ってsubtitleを分析、単語を取得する
+        - punkt: 単語に分割する (word_tokenize)
+        - averaged_perceptron_tagger: 品詞の取得(pos_tag)
+
+    vocabularies = 抽出した単語
+end note
+service -> controller: $vocabularies
+
+
+== 4. 取得したvocabularyをrepoに追加する ==
+
+== 5. vocabularyをposごとに分別して、repoに追加する ==
+
+
+
+== 5. 頻出単語を取得する ==
+== 5. 頻出単語をrepoに追加する ==
+@enduml
