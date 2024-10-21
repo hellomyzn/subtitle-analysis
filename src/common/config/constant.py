@@ -1,7 +1,14 @@
 """common.constant"""
 
 BASE_SRC_PATH = "/opt/work/src"
-TARGET_PATH = "friends/s01/ep01"
+TITLE = "friends"
+SEASON = "s01"
+EPISODE = "ep21"
+
+TARGET_EPISODE_PATH = f"{TITLE}/{SEASON}/{EPISODE}"
+TARGET_SEASON_PATH = f"{TITLE}/{SEASON}"
+
+TARGET_PATH = TARGET_SEASON_PATH
 
 SUBS_PATH = f"{BASE_SRC_PATH}/subtitles/{TARGET_PATH}"
 SUBS_CSV_PATH = f"{BASE_SRC_PATH}/csv/{TARGET_PATH}/subtitles"

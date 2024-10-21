@@ -45,6 +45,17 @@ class SubtitleService(object):
         return subs
 
     @exception_module
+    def gets_from_srt(self) -> list[Subtitle, ]:
+        """get all season subtitles from srt file
+
+        Returns:
+            list[Subtitle, ]: subtitles
+        """
+
+        subs = self.srt_repo.gets()
+        return subs
+
+    @exception_module
     def write_csv(self, subs: list[Subtitle, ]) -> None:
         """write subtitle on csv
 

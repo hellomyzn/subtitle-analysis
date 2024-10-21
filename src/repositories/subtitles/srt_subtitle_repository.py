@@ -44,6 +44,33 @@ class SrtSubtitleRepository(object):
         info("get subtitles successfully. lines: {0}", len(sentences))
         return sentences
 
+    def gets(self) -> list[dict[int, str],]:
+        """get subtitles
+
+        Returns:
+            list[dict[int, str],]: sentences
+        """
+        from utils.helper import ls
+        lines_list = []
+
+        for dir in ls(SUBS_PATH):
+            if "." in dir:
+                continue
+            if "all" in dir:
+                continue
+
+            subs_ep_path = f"{SUBS_PATH}/{dir}"
+            self.path = get_file_path(subs_ep_path)
+
+            # read
+            with open(file=self.path, mode="r", encoding="utf-8") as file:
+                lines_list += file.readlines()
+
+        # format
+        sentences = self.__parse_to_sentence(lines_list)
+        info("get subtitles successfully. lines: {0}", len(sentences))
+        return sentences
+
     def __parse_to_sentence(self, lines: list) -> list:
         """format subtitles
 
