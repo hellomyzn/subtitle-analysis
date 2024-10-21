@@ -2,7 +2,7 @@
 #########################################################
 # Builtin packages
 #########################################################
-import requests
+# (None)
 
 #########################################################
 # 3rd party packages
@@ -13,6 +13,8 @@ import bs4
 # Own packages
 #########################################################
 from common.config import Config
+from common.log import error
+from common.request import get
 from models import Vocabulary
 
 CONFIG = Config().config
@@ -43,7 +45,7 @@ def scrap_vocabulary(vocab: Vocabulary | str) -> tuple[str | None, str | None, s
 
     if IS_OFFLINE:
         return None, None, None, None, "offline mode"
-    html = requests.get(url, headers=headers, timeout=5)
+    html = get(url, headers=headers, timeout=60)
     soup = bs4.BeautifulSoup(html.content, "html.parser")
     # Level keys
     level_keys = {
