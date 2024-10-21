@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 # Own packages
 #########################################################
 from common.config import SUBS_PATH
-from common.log import info
+from common.log import info, warn
 from models import Subtitle
 from utils import get_file_path
 
